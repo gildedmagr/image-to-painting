@@ -1,20 +1,33 @@
-FROM java:8
+FROM asuprun/opencv-java
 
 # Install maven
-RUN apt-get update
-RUN apt-get install -y maven
+RUN apk update
+RUN apk add -y maven
+
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk
+RUN export JAVA_HOME
+
+#COPY opencv-install.sh opencv-install.sh
+
+#RUN chmod +x opencv-install.sh && sync && ./opencv-install.sh
+
+#RUN apt-get install -y python3.8
+
+RUN echo $JAVA_HOME
+
 
 WORKDIR /code
 
+COPY target/pechat-canvas-1.0-SNAPSHOT.jar /code/app.jar
+COPY src/main/resources/images/test.jpg /code/test.jpg
+
 # Prepare by downloading dependencies
 ADD pom.xml /code/pom.xml
-RUN ["mvn", "dependency:resolve"]
-RUN ["mvn", "verify"]
 
 # Adding source, compile and package into a fat jar
 ADD src /code/src
-RUN ["mvn", "package"]
+#RUN ["mvn", "package"]
 
-EXPOSE 4567
-CMD ["/usr/lib/jvm/java-8-openjdk-amd64/bin/java", "-jar", "target/sparkexample-jar-with-dependencies.jar"]
-Copy
+EXPOSE 27017
+EXPOSE 8888
+#CMD ["java", "-jar", "target/pechat-canvas-1.0-SNAPSHOT.jar"]

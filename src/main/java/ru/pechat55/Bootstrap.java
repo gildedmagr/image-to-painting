@@ -9,9 +9,10 @@ public class Bootstrap {
     public Bootstrap(){
         Spark.port(8888);
         Spark.staticFiles.location("/");
+        Spark.staticFiles.externalLocation("/code");
         Spark.get("/", (request, response) -> {
-            Application.generateFiles();
-            response.body("Hello");
+            //Application.generateFiles();
+            //response.body("Hello");
             return "Hello World";
         });
     }
