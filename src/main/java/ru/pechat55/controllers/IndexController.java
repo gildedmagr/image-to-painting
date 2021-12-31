@@ -23,6 +23,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import ru.pechat55.utils.Utils;
 
 import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
@@ -74,8 +75,8 @@ public class IndexController {
         String filenameBorder = PATH + "border.png";
         String filenameFinalWithPoints = "C:\\Users\\Andriy\\IdeaProjects\\pechat-canvas\\src\\main\\resources\\points.jpeg";
 
-        //Mat image = Imgcodecs.imread("/Users/andriiprotsenko/IdeaProjects/image-to-painting/src/main/resources/images/photo.jpg");
-        BufferedImage bufferedImage = null;
+        Mat image = Imgcodecs.imread(filename);
+        /*BufferedImage bufferedImage = null;
         try {
             bufferedImage = ImageIO.read(new File(PATH, "test.jpg"));
         } catch (IOException e) {
@@ -97,13 +98,13 @@ public class IndexController {
         }
 
 
-        image = Imgcodecs.imdecode(new MatOfByte(byteArrayOutputStream.toByteArray()), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);
+        image = Imgcodecs.imdecode(new MatOfByte(byteArrayOutputStream.toByteArray()), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);*/
         //logger.info(image.dump());
         if (image != null) {
 
             Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2BGRA);
             //Imgproc.GaussianBlur(image, image, new Size(3, 3), 10);
-            image = cropImage(image);
+            image = prepareImageForPainting(image);
 
             Point[] srcTri = new Point[4];
             srcTri[0] = new Point(0, 0);
@@ -134,7 +135,7 @@ public class IndexController {
 
             // Imgproc.resize(image, warpDst, new Size(100,100), 0, 0, INTER_AREA);
 
-            Mat border = createBorder(image);
+            Mat border = createPaintingBorder(image);
 
 
 
@@ -144,20 +145,20 @@ public class IndexController {
             Imgcodecs.imwrite(filenameBorder, border);
 
             try{
-                combine();
+                create3DPainting();
             }catch (Exception e){
                 e.printStackTrace();
             }
         }
-        createInterior();
+        createInteriorWithPainting();
         long endTime = System.currentTimeMillis();
 
         logger.info("That took {} seconds", (endTime - startTime) / 1000);
         logger.info("Transformation finished...");
     }
 
-    private static Mat createBorder(Mat image) {
-
+    // create border of the painting
+    private static Mat createPaintingBorder(Mat image) {
         // copy image
         Mat border = new Mat(image, new Rect(0, 0, image.cols(), image.rows()));
 
@@ -167,15 +168,15 @@ public class IndexController {
         border = new Mat(border, rectCrop);
         // flip horizontally
         Core.flip(border, border, 1);
+        // decrease brightness
+        border.convertTo(border, -1, 1, -20);
 
-        // perspective transform
-
+        // perspective transformation points
         Point[] srcTri = new Point[4];
         srcTri[0] = new Point(0, 0);
         srcTri[1] = new Point(border.cols() - 1, 0);
         srcTri[2] = new Point(border.cols() - 1, border.rows() - 1);
         srcTri[3] = new Point(0, border.rows() - 1);
-
 
         Point[] dstTri = new Point[4];
         dstTri[0] = new Point(0, 0);
@@ -183,17 +184,16 @@ public class IndexController {
         dstTri[2] = new Point(border.cols() - 1, border.rows() - 30);
         dstTri[3] = new Point(0, border.rows() - 1);
 
-        border.convertTo(border, -1, 1, -20);
-        // Imgproc.cvtColor(border, border, Imgproc.COLOR_BGR2RGB);
+
+        // perspective transformation
         Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
         Mat warpDst = Mat.zeros(border.rows(), border.cols(), CvType.CV_8U);
         Imgproc.warpPerspective(border, warpDst, warpMat, warpDst.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(0, 0, 0, 255));
-
-        //Imgproc.line(warpDst, new Point(0, 0), new Point(0, warpDst.height()), new Scalar(0, 125, 125), 1);
         return warpDst;
     }
 
-    private static void createInterior() {
+    // put the painting to interiors
+    private static void createInteriorWithPainting() {
         try {
             BufferedImage wall = ImageIO.read(new File("/Users/andriiprotsenko/IdeaProjects/image-to-painting/src/main/resources/images/textured-wall-finishes.jpg"));
             BufferedImage picture = ImageIO.read(new File(PATH, "test.jpg"));
@@ -217,7 +217,8 @@ public class IndexController {
         }
     }
 
-    private static Mat cropImage(Mat image) {
+    // crop and rotate image
+    private static Mat prepareImageForPainting(Mat image) {
         float finalWidth = 300;
         float finalHeight = 400;
         Mat res = new Mat(image, new Rect(0, 0, image.cols(), image.rows()));
@@ -243,7 +244,7 @@ public class IndexController {
         return res;
     }
 
-    public static void combine() throws IOException {
+    public static void create3DPainting() throws IOException {
         BufferedImage image = ImageIO.read(new File(PATH, "result.png"));
         BufferedImage border = ImageIO.read(new File(PATH, "border.png"));
 
@@ -265,9 +266,7 @@ public class IndexController {
         g.drawImage(border, w + (shadow.getWidth() - combined.getWidth()) / 2, (shadow.getHeight() - combined.getHeight()) / 2, null);
         g.dispose();
 
-        ImageIO.write(shadow, "PNG", new File(PATH, "combined.png"));
-
-
+        ImageIO.write(shadow, "PNG", new File(PATH, "painting-3d.png"));
     }
 
     /**
@@ -279,9 +278,7 @@ public class IndexController {
      */
     public static BufferedImage createDropShadow(BufferedImage image,
                                                  int size) {
-        BufferedImage shadow = new BufferedImage(image.getWidth() + 4
-                * size, image.getHeight() + 4 * size,
-                BufferedImage.TYPE_INT_ARGB);
+        BufferedImage shadow = new BufferedImage(image.getWidth() + 4 * size, image.getHeight() + 4 * size, BufferedImage.TYPE_INT_ARGB);
 
         Graphics2D g2 = shadow.createGraphics();
         g2.drawImage(image, size * 2, size * 2, null);
@@ -293,49 +290,14 @@ public class IndexController {
 
         g2.dispose();
 
-        shadow = getGaussianBlurFilter(size, true).filter(shadow, null);
-        shadow = getGaussianBlurFilter(size, false).filter(shadow, null);
+        shadow = Utils.getGaussianBlurFilter(size, true).filter(shadow, null);
+        shadow = Utils.getGaussianBlurFilter(size, false).filter(shadow, null);
 
         return shadow;
 
     }
 
-    /**
-     * Create an gaussian blur filter
-     *
-     * @param radius     radius of the filter
-     * @param horizontal whether it is horizontal blur
-     * @return ConvolveOp  filter
-     */
-    public static ConvolveOp getGaussianBlurFilter(int radius,
-                                                   boolean horizontal) {
-        if (radius < 1) {
-            throw new IllegalArgumentException("Radius must be >= 1");
-        }
-        int size = radius * 2 + 1;
-        float[] data = new float[size];
-        float sigma = radius / 3.0f;
-        float twoSigmaSquare = 2.0f * sigma * sigma;
-        float sigmaRoot = (float) Math.sqrt(twoSigmaSquare * Math.PI);
-        float total = 0.0f;
-        for (int i = -radius; i <= radius; i++) {
-            float distance = i * i;
-            int index = i + radius;
-            data[index] = (float) Math.exp(-distance / twoSigmaSquare)
-                    / sigmaRoot;
-            total += data[index];
-        }
-        for (int i = 0; i < data.length; i++) {
-            data[i] /= total;
-        }
-        Kernel kernel;
-        if (horizontal) {
-            kernel = new Kernel(size, 1, data);
-        } else {
-            kernel = new Kernel(1, size, data);
-        }
-        return new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
-    }
+
 
 
     private static void drawTransformPoints(String filenameFinalWithPoints, Mat image, Point[] srcTri, Point[] dstTri) {

@@ -25,12 +25,12 @@ import static org.opencv.imgproc.Imgproc.INTER_AREA;
 class Application {
 
     public static void main(String... args) {
-       // Bootstrap.start();
+        Bootstrap.start();
         OpenCV.loadShared();
         //System.loadLibrary( Core.NATIVE_LIBRARY_NAME );
         System.out.println("Loaded OpenCV version "+ Core.VERSION);
         //SpringApplication.run(Application.class, args);
-        IndexController.generateFiles();
+       // IndexController.generateFiles();
     }
 
 

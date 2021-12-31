@@ -1,6 +1,7 @@
 package ru.pechat55;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.pechat55.controllers.IndexController;
 import spark.Spark;
 
 public class Bootstrap {
@@ -11,8 +12,7 @@ public class Bootstrap {
         Spark.staticFiles.location("/");
         Spark.staticFiles.externalLocation("/code");
         Spark.get("/", (request, response) -> {
-            //Application.generateFiles();
-            //response.body("Hello");
+            IndexController.generateFiles();
             return "Hello World";
         });
     }
