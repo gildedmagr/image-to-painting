@@ -12,7 +12,7 @@ public class Bootstrap {
         Spark.staticFiles.location("/");
         Spark.staticFiles.externalLocation("/code");
         Spark.get("/", (request, response) -> {
-            IndexController.generateFiles();
+            //IndexController.generateFiles();
             return "Hello World";
         });
     }

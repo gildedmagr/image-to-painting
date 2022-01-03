@@ -1,0 +1,6 @@
+services:
+  painting-backend:
+    build: .
+    ports:
+      - "27017:27017"
+      - "8888:8888"
