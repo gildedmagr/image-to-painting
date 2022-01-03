@@ -25,18 +25,13 @@ public class ApiController {
 
     @PostMapping("generate-preview")
     private Mono<List<String>> generatePreviews(@RequestHeader("Host") String originHost, @RequestBody Object body) {
-        List<String> result = new ArrayList<>();
-        result.add("/images/1.jpg");
-        result.add("/images/2.jpg");
-
         String jsonInString = new Gson().toJson(body);
         JSONObject mJSONObject = new JSONObject(jsonInString);
         String imageUrl = String.valueOf(mJSONObject.get("url"));
         int width = Integer.parseInt(mJSONObject.get("width").toString());
         int height = Integer.parseInt(mJSONObject.get("height").toString());
 
-        System.out.println(originHost);
-        logger.info("Generating previews for image: {}, request: {}", imageUrl, body);
+        logger.info("Generating previews for image: {}, request: {}, host: {}", imageUrl, body, originHost);
         List<String> responseImages  = imageService.generatePreviews(imageUrl, originHost, width, height);
 
         System.out.println(responseImages);
