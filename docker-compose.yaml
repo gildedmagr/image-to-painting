@@ -1,6 +1,7 @@
 services:
   paintingbackend:
     build: .
+    restart: always
     ports:
-      - "27017:27017"
-      - "8888:8888"
+      - 27017:27017
+      - 8888:8888
