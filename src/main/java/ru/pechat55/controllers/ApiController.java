@@ -24,7 +24,7 @@ public class ApiController {
     ImageService imageService;
 
     @PostMapping("generate-preview")
-    private Mono<List<String>> generatePreviews(@RequestHeader("Host") String originHost, @RequestBody Object body) {
+    private Mono<List<String>> generatePreviews(@RequestHeader("origin") String originHost, @RequestBody Object body) {
         String jsonInString = new Gson().toJson(body);
         JSONObject mJSONObject = new JSONObject(jsonInString);
         String imageUrl = String.valueOf(mJSONObject.get("url"));
