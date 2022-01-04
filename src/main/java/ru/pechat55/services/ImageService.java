@@ -50,7 +50,7 @@ public class ImageService {
         // create model with prepared image
         PaintingModel paintingModel = new PaintingModel(requestParam.getWidth(), requestParam.getHeight(), image);
         // create pictures with interior and painting
-        //createInteriorWithPainting(paintingModel, isImageRotated, requestParam.getHost(), requestParam.getId(), responseImages);
+        createInteriorWithPainting(paintingModel, isImageRotated, requestParam.getHost(), requestParam.getId(), responseImages);
         // create 3D painting
         create3DPainting(image, requestParam.getHost(), requestParam.getId(), responseImages);
 
@@ -58,7 +58,7 @@ public class ImageService {
 
         logger.info("That took {} milliseconds", endTime - startTime);
         logger.info("Transformation finished...");
-        Collections.reverse(responseImages);
+        //Collections.reverse(responseImages);
         return responseImages;
     }
 
