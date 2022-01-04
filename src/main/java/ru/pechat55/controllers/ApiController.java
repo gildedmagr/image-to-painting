@@ -24,10 +24,11 @@ public class ApiController {
     ImageService imageService;
 
     @PostMapping("generate-preview")
-    private Mono<List<String>> generatePreviews(@RequestHeader("origin") String originHost, @RequestBody Object body) {
+    private Mono<List<String>> generatePreviews(@RequestBody Object body) {
         String jsonInString = new Gson().toJson(body);
         JSONObject mJSONObject = new JSONObject(jsonInString);
         String imageUrl = String.valueOf(mJSONObject.get("url"));
+        String originHost = String.valueOf(mJSONObject.get("host"));
         int width = Integer.parseInt(mJSONObject.get("width").toString());
         int height = Integer.parseInt(mJSONObject.get("height").toString());
 
@@ -37,5 +38,9 @@ public class ApiController {
         System.out.println(responseImages);
 
         return Mono.just(responseImages);
+    }
+
+    private void validateBody(){
+
     }
 }
