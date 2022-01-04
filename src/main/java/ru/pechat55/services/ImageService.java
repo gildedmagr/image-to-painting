@@ -292,10 +292,17 @@ public class ImageService {
         g.drawImage(border, w + 10, 10, null);
         g.dispose();
 
+        BufferedImage finalPicture = createDropShadow(combined, 30);
 
+        g = finalPicture.createGraphics();
+
+        g.drawImage(image, (finalPicture.getWidth() - combined.getWidth()) / 2, (finalPicture.getHeight() - combined.getHeight()) / 2, null);
+        g.drawImage(border, w + (finalPicture.getWidth() - combined.getWidth()) / 2, (finalPicture.getHeight() - combined.getHeight()) / 2, null);
+
+        g.dispose();
 
         String fileName = "painting-3d.png";
-        String filePath = Utils.saveImage(serverPath, productId, fileName, combined);
+        String filePath = Utils.saveImage(serverPath, productId, fileName, finalPicture);
         responseImages.add(filePath);
     }
 
@@ -310,7 +317,7 @@ public class ImageService {
                                                  int size) {
         BufferedImage shadow = new BufferedImage(image.getWidth() + 4 * size, image.getHeight() + 4 * size, BufferedImage.TYPE_INT_ARGB);
 
-        Graphics2D g2 = shadow.createGraphics();
+      /*  Graphics2D g2 = shadow.createGraphics();
         g2.drawImage(image, size * 2, size * 2, null);
 
         // composite
@@ -321,7 +328,7 @@ public class ImageService {
         g2.dispose();
 
         shadow = Utils.getGaussianBlurFilter(size, true).filter(shadow, null);
-        shadow = Utils.getGaussianBlurFilter(size, false).filter(shadow, null);
+        shadow = Utils.getGaussianBlurFilter(size, false).filter(shadow, null);*/
 
         return shadow;
 
