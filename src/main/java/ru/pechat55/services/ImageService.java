@@ -292,17 +292,10 @@ public class ImageService {
         g.drawImage(border, w + 10, 10, null);
         g.dispose();
 
-        BufferedImage finalPicture = createDropShadow(combined, 30);
 
-        g = finalPicture.createGraphics();
-
-        g.drawImage(image, (finalPicture.getWidth() - combined.getWidth()) / 2, (finalPicture.getHeight() - combined.getHeight()) / 2, null);
-        g.drawImage(border, w + (finalPicture.getWidth() - combined.getWidth()) / 2, (finalPicture.getHeight() - combined.getHeight()) / 2, null);
-
-        g.dispose();
 
         String fileName = "painting-3d.png";
-        String filePath = Utils.saveImage(serverPath, productId, fileName, finalPicture);
+        String filePath = Utils.saveImage(serverPath, productId, fileName, combined);
         responseImages.add(filePath);
     }
 
