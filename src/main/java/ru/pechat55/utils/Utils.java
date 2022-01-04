@@ -22,7 +22,7 @@ import java.util.UUID;
 
 public class Utils {
     private static Logger logger = LoggerFactory.getLogger(Utils.class);
-    public static String IMAGE_DIR = "image\\painting\\";
+    public static String IMAGE_DIR = "image/painting/";
 
     /**
      * Creates an gaussian blur filter
