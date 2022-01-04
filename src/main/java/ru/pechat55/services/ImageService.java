@@ -301,7 +301,7 @@ public class ImageService {
 
         g.dispose();
 
-        String fileName = "painting-3d.png";
+        String fileName = UUID.randomUUID()+".png";
         String filePath = Utils.saveImage(serverPath, productId, fileName, finalPicture);
         responseImages.add(filePath);
     }
