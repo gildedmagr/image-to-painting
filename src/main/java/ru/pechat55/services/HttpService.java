@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import ru.pechat55.models.ResponseFile;
 import ru.pechat55.models.UploadResponse;
 
@@ -32,7 +34,7 @@ public class HttpService {
 
     public Optional<String> upload(String host, BufferedImage bufferedImage) {
         final WebClient webClient = webClientBuilder.build();
-        if(!host.startsWith("https://")){
+        if (!host.startsWith("https://")) {
             host = "https://" + host;
         }
         String url = host + ROUTE_UPLOAD;
@@ -41,13 +43,12 @@ public class HttpService {
                 .uri(url)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData(fromFile(bufferedImage)))
-                .retrieve()
-                .bodyToMono(String.class)
+                .exchangeToMono(resp -> resp.bodyToMono(String.class))
                 .block();
 
         logger.info("Response: {}", response);
         UploadResponse uploadResponse = new Gson().fromJson(response, UploadResponse.class);
-        if(uploadResponse.getError().size() > 0){
+        if (uploadResponse.getError().size() > 0) {
             uploadResponse.getError().forEach(e -> logger.error("Error during uploading image to server, error: {}", e));
             return Optional.empty();
         }
@@ -60,7 +61,7 @@ public class HttpService {
     public MultiValueMap<String, HttpEntity<?>> fromFile(BufferedImage bufferedImage) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            ImageIO.write( bufferedImage, "PNG", baos );
+            ImageIO.write(bufferedImage, "PNG", baos);
             baos.flush();
         } catch (IOException e) {
             logger.error("Can't convert buffered image to input stream", e);

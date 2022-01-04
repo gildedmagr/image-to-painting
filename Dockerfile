@@ -29,5 +29,4 @@ ADD src /code/src
 #RUN ["mvn", "package"]
 
 EXPOSE 27017
-EXPOSE 8888
 #CMD ["java", "-jar", "target/pechat-canvas-1.0-SNAPSHOT.jar"]

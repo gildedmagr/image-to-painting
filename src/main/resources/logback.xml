@@ -1,5 +1,6 @@
 <configuration>
-
+    <timestamp key="byDay" datePattern="yyyyMMdd"/>
+    <property name="LOG_DIR" value="logs" />
     <appender name="STDOUT"
               class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -8,12 +9,30 @@
         </encoder>
     </appender>
 
-    <logger name="org.springframework" level="DEBUG"
-            additivity="false">
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/log.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>log_%d{yyyy-MM-dd}.log</fileNamePattern>
+
+            <!-- keep 30 days' worth of history capped at 3GB total size -->
+            <maxHistory>3</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.eclipse.jetty.server.Server" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
         <appender-ref ref="STDOUT" />
     </logger>
 
-    <root level="ERROR">
+    <root evel="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
         <appender-ref ref="STDOUT" />
     </root>
 
