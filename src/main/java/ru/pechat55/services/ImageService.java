@@ -287,21 +287,18 @@ public class ImageService {
         BufferedImage combined = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 
         // paint both images, preserving the alpha channels
-        Graphics2D g = combined.createGraphics();
-        g.drawImage(image, 10, 10, null);
-        g.drawImage(border, w + 10, 10, null);
-        g.dispose();
-
+        Graphics combinedGraphics = combined.createGraphics();
+        combinedGraphics.drawImage(image, 10, 10, null);
+        combinedGraphics.drawImage(border, w + 10, 10, null);
+        combinedGraphics.dispose();
         BufferedImage finalPicture = createDropShadow(combined, 30);
 
-        g = finalPicture.createGraphics();
+        Graphics finalPictureGraphics = finalPicture.createGraphics();
+        finalPictureGraphics.drawImage(image, (finalPicture.getWidth() - combined.getWidth()) / 2, (finalPicture.getHeight() - combined.getHeight()) / 2, null);
+        finalPictureGraphics.drawImage(border, w + (finalPicture.getWidth() - combined.getWidth()) / 2, (finalPicture.getHeight() - combined.getHeight()) / 2, null);
+        finalPictureGraphics.dispose();
 
-        g.drawImage(image, (finalPicture.getWidth() - combined.getWidth()) / 2, (finalPicture.getHeight() - combined.getHeight()) / 2, null);
-        g.drawImage(border, w + (finalPicture.getWidth() - combined.getWidth()) / 2, (finalPicture.getHeight() - combined.getHeight()) / 2, null);
-
-        g.dispose();
-
-        String fileName = UUID.randomUUID()+".png";
+        String fileName = "painting-3d.png";
         String filePath = Utils.saveImage(serverPath, productId, fileName, finalPicture);
         responseImages.add(filePath);
     }
