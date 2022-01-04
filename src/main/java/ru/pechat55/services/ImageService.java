@@ -2,6 +2,7 @@ package ru.pechat55.services;
 
 import org.opencv.core.*;
 import org.opencv.core.Point;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,59 +10,55 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.pechat55.models.InteriorModel;
 import ru.pechat55.models.PaintingModel;
+import ru.pechat55.models.RequestModel;
 import ru.pechat55.utils.Utils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class ImageService {
     private static Logger logger = LoggerFactory.getLogger(ImageService.class);
-    private static String PATH = "D:\\tmp\\";
 
-    @Autowired
-    HttpService httpService;
-
-
-    public List<String> generatePreviews(String url, String originHost, int width, int height) {
+    /**
+     * Creates pseudo 3D picture from 2D and generates designs with painting
+     *
+     * @param requestParam - the input parameters
+     * @return list with links to generated images
+     */
+    public List<String> generatePreviews(RequestModel requestParam) {
         logger.info("Starting transformation...");
         long startTime = System.currentTimeMillis();
         List<String> responseImages = new ArrayList<>();
 
-        Mat image = Utils.urlToMat(url);
+        //Mat image = Utils.urlToMat(url);
+        Mat image = Imgcodecs.imread(requestParam.getHost() + File.separator + requestParam.getUrl());
 
-        if (image != null) {
+        Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2BGRA);
 
-            PaintingModel paintingModel = new PaintingModel(width, height, image);
-
-            Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2BGRA);
-
-            AtomicBoolean isImageRotated = new AtomicBoolean(false);
-            image = prepareImageForPainting(image, isImageRotated, width, height);
-
-            Mat warpImage = imagePerspectiveTransform(image);
-
-            try {
-                Mat border = createPaintingBorder(image);
-                create3DPainting(Utils.mat2BufferedImage(warpImage), Utils.mat2BufferedImage(border), originHost, responseImages);
-                createInteriorWithPainting(paintingModel, isImageRotated, originHost, responseImages);
-            } catch (IOException e) {
-                logger.info("Problem to create 3D painting", e);
-            }
-        }
+        AtomicBoolean isImageRotated = new AtomicBoolean(false);
+        // crop and rotate image
+        image = prepareImageForPainting(image, isImageRotated, requestParam.getWidth(), requestParam.getHeight());
+        // create model with prepared image
+        PaintingModel paintingModel = new PaintingModel(requestParam.getWidth(), requestParam.getHeight(), image);
+        // create pictures with interior and painting
+        createInteriorWithPainting(paintingModel, isImageRotated, requestParam.getHost(), requestParam.getId(), responseImages);
+        // create 3D painting
+        create3DPainting(image, requestParam.getHost(), requestParam.getId(), responseImages);
 
         long endTime = System.currentTimeMillis();
 
         logger.info("That took {} milliseconds", endTime - startTime);
         logger.info("Transformation finished...");
+        Collections.reverse(responseImages);
         return responseImages;
     }
 
@@ -86,14 +83,14 @@ public class ImageService {
         Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
 
         Imgproc.warpPerspective(image, warpImage, warpMat, warpImage.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
-        Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(255, 255, 255, 200), 2);
+        Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(255, 255, 255, 200), 1);
         return warpImage;
     }
 
     // crop and rotate image
     private Mat prepareImageForPainting(Mat image, AtomicBoolean isImageRotated, int width, int height) {
-        float finalWidth = width * 10 * 3;
-        float finalHeight = height * 10 * 3;
+        float finalWidth = 1000;//width * 10 * 3;
+        float finalHeight = 1000;//height * 10 * 3;
         Mat res = new Mat(image, new Rect(0, 0, image.cols(), image.rows()));
 
 
@@ -123,7 +120,7 @@ public class ImageService {
 
         res = new Mat(res, rectCrop);
 
-        //Imgcodecs.imwrite(PATH + "crop.jpg", res);
+        Imgcodecs.imwrite("D:\\tmp\\" + "crop.jpg", res);
         return res;
     }
 
@@ -160,23 +157,24 @@ public class ImageService {
         // perspective transformation
         Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
         Mat warpDst = Mat.zeros(border.rows(), border.cols(), CvType.CV_8U);
-        Imgproc.warpPerspective(border, warpDst, warpMat, warpDst.size(), Imgproc.INTER_CUBIC, Core.BORDER_CONSTANT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(border, warpDst, warpMat, warpDst.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        String filePath = "D:\\tmp\\" + "border.png";
+        Imgcodecs.imwrite(filePath, warpDst);
         return warpDst;
     }
 
     // put the painting to interiors
     private void createInteriorWithPainting(PaintingModel paintingModel, AtomicBoolean isImageRotated,
-                                            String originHost, List<String> responseImages) {
+                                            String originHost, String productId, List<String> responseImages) {
         List<InteriorModel> walls = new ArrayList<>();
-        //walls.add(new InteriorModel("/images/textured-wall-finishes.jpg", 270, 150, 200));
-        //walls.add(new InteriorModel("/images/wall.jpg", 1445, 424, 200));
+
         walls.add(new InteriorModel("/wall1.jpg", 860, 410, 200));
         walls.add(new InteriorModel("/wall2.jpg", 830, 340, 200));
         walls.add(new InteriorModel("/wall3.jpg", 1200, 350, 200));
         AtomicInteger index = new AtomicInteger();
 
         walls.forEach(interiorWall ->
-                drawPictureOnWall(paintingModel, index, interiorWall, isImageRotated, originHost)
+                drawPictureOnWall(paintingModel, index, interiorWall, isImageRotated, originHost, productId)
                         .ifPresent(responseImages::add)
         );
 
@@ -184,7 +182,8 @@ public class ImageService {
 
     // draw picture on the wall using the coordinates and calculated size
     private Optional<String> drawPictureOnWall(PaintingModel paintingModel, AtomicInteger index,
-                                               InteriorModel interiorWall, AtomicBoolean isImageRotated, String originHost) {
+                                               InteriorModel interiorWall, AtomicBoolean isImageRotated,
+                                               String originHost, String productId) {
         // get IS from resource directory
         InputStream is = ImageService.class.getResourceAsStream(interiorWall.getImageName());
 
@@ -205,13 +204,13 @@ public class ImageService {
         // create the new image
         int w = wall.getWidth();
         int h = wall.getHeight();
-        BufferedImage combined = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage combined = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 
         // clone cropped image
         Mat croppedImage = paintingModel.getImage().clone();
         logger.info("Image was rotated: {}", isImageRotated);
         if (isImageRotated.get()) {
-            //Core.rotate(croppedImage, croppedImage, Core.ROTATE_90_CLOCKWISE);
+            Core.rotate(croppedImage, croppedImage, Core.ROTATE_90_CLOCKWISE);
         }
 
         logger.info("Picture height: {}", croppedImage.height());
@@ -255,12 +254,29 @@ public class ImageService {
         g.drawImage(shadow, shadowX, shadowY, shadow.getWidth(), shadow.getHeight(), null);
         g.drawImage(picture, pictureX, pictureY, picture.getWidth(), picture.getHeight(), null);
         g.dispose();
-        //ImageIO.write(combined, "PNG", new File(PATH, "final-interior-" + (index.getAndIncrement()) + ".png"));
-        return httpService.upload(originHost, combined);
+
+
+        String fileName = "final-interior-" + (index.getAndIncrement()) + ".jpg";
+        String filePath = Utils.saveImage(originHost, productId, fileName, combined);
+        return Optional.of(filePath);
     }
 
 
-    public void create3DPainting(BufferedImage image, BufferedImage border, String originHost, List<String> responseImages) {
+    public void create3DPainting(Mat croppedImage, String serverPath, String productId, List<String> responseImages) {
+
+        Mat warpImageMat = imagePerspectiveTransform(croppedImage);
+        Mat borderMat = createPaintingBorder(croppedImage);
+
+        BufferedImage image = null;
+        BufferedImage border = null;
+        try {
+            image = Utils.mat2BufferedImage(warpImageMat);
+            border = Utils.mat2BufferedImage(borderMat);
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.error("Can't convert OpenCV matrix to buffered image", e);
+        }
+
         // create the new image, canvas size is the max. of both image sizes
         int w = Math.max(image.getWidth(), border.getWidth());
         int h = Math.max(image.getHeight(), border.getHeight());
@@ -272,18 +288,18 @@ public class ImageService {
         g.drawImage(border, w + 10, 10, null);
         g.dispose();
 
-        BufferedImage shadow = createDropShadow(combined, 30);
+        BufferedImage finalPicture = createDropShadow(combined, 30);
 
-        g = shadow.createGraphics();
+        g = finalPicture.createGraphics();
 
-        g.drawImage(image, (shadow.getWidth() - combined.getWidth()) / 2, (shadow.getHeight() - combined.getHeight()) / 2, null);
-        g.drawImage(border, w + (shadow.getWidth() - combined.getWidth()) / 2, (shadow.getHeight() - combined.getHeight()) / 2, null);
+        g.drawImage(image, (finalPicture.getWidth() - combined.getWidth()) / 2, (finalPicture.getHeight() - combined.getHeight()) / 2, null);
+        g.drawImage(border, w + (finalPicture.getWidth() - combined.getWidth()) / 2, (finalPicture.getHeight() - combined.getHeight()) / 2, null);
 
         g.dispose();
 
-        Optional<String> fileUrl = httpService.upload(originHost, shadow);
-        fileUrl.ifPresent(responseImages::add);
-        //ImageIO.write(shadow, "PNG", new File(PATH, "painting-3d.png"));
+        String fileName = "painting-3d.png";
+        String filePath = Utils.saveImage(serverPath, productId, fileName, finalPicture);
+        responseImages.add(filePath);
     }
 
     /**

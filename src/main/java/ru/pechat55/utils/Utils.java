@@ -18,12 +18,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.UUID;
 
 public class Utils {
     private static Logger logger = LoggerFactory.getLogger(Utils.class);
+    public static String IMAGE_DIR = "image\\painting\\";
 
     /**
-     * Create an gaussian blur filter
+     * Creates an gaussian blur filter
      *
      * @param radius     radius of the filter
      * @param horizontal whether it is horizontal blur
@@ -59,6 +61,12 @@ public class Utils {
         return new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
     }
 
+    /**
+     * Downloads and convert url of image to OpenCV matrix
+     *
+     * @param imageUrl string of image url
+     * @return OpenCV matrix
+     */
     public static Mat urlToMat(String imageUrl) {
         BufferedImage bufferedImage = null;
         try {
@@ -76,6 +84,12 @@ public class Utils {
         return bufferedImageToMat(bufferedImage);
     }
 
+    /**
+     * Converts {@link BufferedImage} to OpenCV matrix
+     *
+     * @param bufferedImage {@link BufferedImage}
+     * @return OpenCV matrix
+     */
     public static Mat bufferedImageToMat(BufferedImage bufferedImage) {
         byte[] pixels = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData();
 
@@ -97,11 +111,53 @@ public class Utils {
         return image;
     }
 
+    /**
+     * Converts OpenCV matrix to {@link BufferedImage}
+     * @param matrix OpenCV matrix
+     * @return {@link BufferedImage}
+     * @throws IOException
+     */
     public static BufferedImage mat2BufferedImage(Mat matrix) throws IOException {
         MatOfByte mob = new MatOfByte();
         Imgcodecs.imencode(".png", matrix, mob);
         byte[] ba = mob.toArray();
 
         return ImageIO.read(new ByteArrayInputStream(ba));
+    }
+
+    /**
+     * Saves {@link BufferedImage} to local disk
+     *
+     * @param parentPath first chunk of the path
+     * @param id the unique ID, is used as directory name
+     * @param finalName the file name
+     * @param image {@link BufferedImage} instance
+     * @return relative file path
+     */
+    public static String saveImage(String parentPath, String id, String finalName, BufferedImage image){
+        String filePath = createFinalDir(parentPath, id) + finalName;
+        String extension = image.getType() == BufferedImage.TYPE_INT_RGB ? "JPG" : "PNG";
+        try {
+            ImageIO.write(image, extension, new File(parentPath, filePath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return filePath;
+    }
+
+    /**
+     * Creates dir if it doesn't exist
+     *
+     * @param host parent part of the path
+     * @param child second part of the path
+     * @return concatenated path
+     */
+    public static String createFinalDir(String host, String child){
+        String childDir = IMAGE_DIR + child;
+        File directory = new File(host, childDir);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        return childDir + File.separator;
     }
 }

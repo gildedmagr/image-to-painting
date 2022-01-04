@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+import ru.pechat55.models.RequestModel;
+import ru.pechat55.models.UploadResponse;
 import ru.pechat55.services.ImageService;
 
 import java.util.List;
@@ -22,24 +24,20 @@ public class ApiController {
     @Autowired
     ImageService imageService;
 
+    /**
+     * This endpoint generates 3D painting and preview for picture
+     *
+     * @param body input parameters
+     * @return list of the url
+     */
     @PostMapping("generate-preview")
-    private Mono<List<String>> generatePreviews(@RequestBody Object body) {
-        String jsonInString = new Gson().toJson(body);
-        JSONObject mJSONObject = new JSONObject(jsonInString);
-        String imageUrl = String.valueOf(mJSONObject.get("url"));
-        String originHost = String.valueOf(mJSONObject.get("host"));
-        int width = Integer.parseInt(mJSONObject.get("width").toString());
-        int height = Integer.parseInt(mJSONObject.get("height").toString());
+    private Mono<List<String>> generatePreviews(@RequestBody RequestModel body) {
 
-        logger.info("Generating previews for image: {}, request: {}, host: {}", imageUrl, body, originHost);
-        List<String> responseImages  = imageService.generatePreviews(imageUrl, originHost, width, height);
+        logger.info("Generating previews for image: {}, request: {}", body.getUrl(), body);
+        List<String> responseImages  = imageService.generatePreviews(body);
 
         System.out.println(responseImages);
 
         return Mono.just(responseImages);
-    }
-
-    private void validateBody(){
-
     }
 }

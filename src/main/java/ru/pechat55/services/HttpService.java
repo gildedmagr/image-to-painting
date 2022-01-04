@@ -21,6 +21,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -60,14 +61,16 @@ public class HttpService {
 
     public MultiValueMap<String, HttpEntity<?>> fromFile(BufferedImage bufferedImage) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        System.out.println(bufferedImage.getType());
+        String extension = bufferedImage.getType() == BufferedImage.TYPE_INT_RGB ? "jpg" : "png";
         try {
-            ImageIO.write(bufferedImage, "PNG", baos);
+            ImageIO.write(bufferedImage, extension.toLowerCase(Locale.ROOT), baos);
             baos.flush();
         } catch (IOException e) {
             logger.error("Can't convert buffered image to input stream", e);
         }
 
-        String header = String.format("form-data; name=%s; filename=%s", "file", UUID.randomUUID() + ".png");
+        String header = String.format("form-data; name=%s; filename=%s", "file", UUID.randomUUID() + "." + extension);
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         builder.part("file", new ByteArrayResource(baos.toByteArray())).header("Content-Disposition", header);
