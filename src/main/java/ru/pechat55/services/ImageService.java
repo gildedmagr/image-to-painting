@@ -49,10 +49,10 @@ public class ImageService {
 
             Mat warpImage = imagePerspectiveTransform(image);
 
-            createInteriorWithPainting(paintingModel, isImageRotated, originHost, responseImages);
-            Mat border = createPaintingBorder(image);
             try {
+                Mat border = createPaintingBorder(image);
                 create3DPainting(Utils.mat2BufferedImage(warpImage), Utils.mat2BufferedImage(border), originHost, responseImages);
+                createInteriorWithPainting(paintingModel, isImageRotated, originHost, responseImages);
             } catch (IOException e) {
                 logger.info("Problem to create 3D painting", e);
             }
@@ -160,7 +160,7 @@ public class ImageService {
         // perspective transformation
         Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
         Mat warpDst = Mat.zeros(border.rows(), border.cols(), CvType.CV_8U);
-        Imgproc.warpPerspective(border, warpDst, warpMat, warpDst.size(), Imgproc.INTER_CUBIC, Core.BORDER_CONSTANT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(border, warpDst, warpMat, warpDst.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         return warpDst;
     }
 
