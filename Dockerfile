@@ -1,4 +1,4 @@
-FROM asuprun/opencv-java
+FROM openjdk:11
 
 # Install maven
 RUN apk update
