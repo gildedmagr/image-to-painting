@@ -161,7 +161,7 @@ public class ImageService {
         // perspective transformation
         Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
         Mat warpDst = Mat.zeros(border.rows(), border.cols(), CvType.CV_8U);
-        Imgproc.warpPerspective(border, warpDst, warpMat, warpDst.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(border, warpDst, warpMat, warpDst.size(), Imgproc.INTER_CUBIC, Core.BORDER_CONSTANT, new Scalar(255, 255, 255, 255));
         //String filePath = "D:\\tmp\\" + "border.png";
         //Imgcodecs.imwrite(filePath, warpDst);
         return warpDst;
@@ -317,7 +317,7 @@ public class ImageService {
                                                  int size) {
         BufferedImage shadow = new BufferedImage(image.getWidth() + 4 * size, image.getHeight() + 4 * size, BufferedImage.TYPE_INT_ARGB);
 
-      /*  Graphics2D g2 = shadow.createGraphics();
+        Graphics2D g2 = shadow.createGraphics();
         g2.drawImage(image, size * 2, size * 2, null);
 
         // composite
@@ -328,7 +328,7 @@ public class ImageService {
         g2.dispose();
 
         shadow = Utils.getGaussianBlurFilter(size, true).filter(shadow, null);
-        shadow = Utils.getGaussianBlurFilter(size, false).filter(shadow, null);*/
+        shadow = Utils.getGaussianBlurFilter(size, false).filter(shadow, null);
 
         return shadow;
 
