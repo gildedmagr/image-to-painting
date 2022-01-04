@@ -120,7 +120,6 @@ public class ImageService {
 
         res = new Mat(res, rectCrop);
 
-        Imgcodecs.imwrite("D:\\tmp\\" + "crop.jpg", res);
         return res;
     }
 
@@ -157,9 +156,9 @@ public class ImageService {
         // perspective transformation
         Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
         Mat warpDst = Mat.zeros(border.rows(), border.cols(), CvType.CV_8U);
-        Imgproc.warpPerspective(border, warpDst, warpMat, warpDst.size(), Imgproc.INTER_CUBIC, Core.BORDER_CONSTANT, new Scalar(255, 255, 255, 255));
-        String filePath = "D:\\tmp\\" + "border.png";
-        Imgcodecs.imwrite(filePath, warpDst);
+        Imgproc.warpPerspective(border, warpDst, warpMat, warpDst.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        //String filePath = "D:\\tmp\\" + "border.png";
+        //Imgcodecs.imwrite(filePath, warpDst);
         return warpDst;
     }
 
