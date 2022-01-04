@@ -26,12 +26,12 @@
         </encoder>
     </appender>
 
-    <logger name="org.eclipse.jetty.server.Server" level="DEBUG" additivity="false">
+    <logger name="org.springframework" level="DEBUG" additivity="false">
         <appender-ref ref="FILE" />
         <appender-ref ref="STDOUT" />
     </logger>
 
-    <root evel="DEBUG" additivity="false">
+    <root level="DEBUG" additivity="false">
         <appender-ref ref="FILE" />
         <appender-ref ref="STDOUT" />
     </root>
