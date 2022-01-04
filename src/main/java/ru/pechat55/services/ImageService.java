@@ -47,12 +47,17 @@ public class ImageService {
         AtomicBoolean isImageRotated = new AtomicBoolean(false);
         // crop and rotate image
         image = prepareImageForPainting(image, isImageRotated, requestParam.getWidth(), requestParam.getHeight());
-        // create model with prepared image
-        PaintingModel paintingModel = new PaintingModel(requestParam.getWidth(), requestParam.getHeight(), image);
-        // create pictures with interior and painting
-        createInteriorWithPainting(paintingModel, isImageRotated, requestParam.getHost(), requestParam.getId(), responseImages);
+
         // create 3D painting
         create3DPainting(image, requestParam.getHost(), requestParam.getId(), responseImages);
+
+        // create model with prepared image
+        PaintingModel paintingModel = new PaintingModel(requestParam.getWidth(), requestParam.getHeight(), image);
+
+        // create pictures with interior and painting
+        createInteriorWithPainting(paintingModel, isImageRotated, requestParam.getHost(), requestParam.getId(), responseImages);
+
+
 
         long endTime = System.currentTimeMillis();
 
