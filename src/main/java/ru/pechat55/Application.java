@@ -10,9 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 class Application {
 
     public static void main(String... args) {
-        Bootstrap.start();
         System.out.println(Core.NATIVE_LIBRARY_NAME);
-
         //System.loadLibrary( Core.NATIVE_LIBRARY_NAME );
         OpenCV.loadShared();
         System.out.println("Loaded OpenCV version " + Core.VERSION);
