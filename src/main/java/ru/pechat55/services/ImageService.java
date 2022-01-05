@@ -45,7 +45,7 @@ public class ImageService {
 
         AtomicBoolean isImageRotated = new AtomicBoolean(false);
         // crop and rotate image
-        //image = prepareImageForPainting(image, isImageRotated, requestParam.getWidth(), requestParam.getHeight());
+        image = prepareImageForPainting(image, isImageRotated, requestParam.getWidth(), requestParam.getHeight());
 
         // create 3D painting
         create3DPainting(image, requestParam.getHost(), requestParam.getId(), responseImages);
@@ -95,8 +95,8 @@ public class ImageService {
 
     // crop and rotate image
     private Mat prepareImageForPainting(Mat image, AtomicBoolean isImageRotated, int width, int height) {
-        float finalWidth = 1000;//width * 10 * 3;
-        float finalHeight = 1000;//height * 10 * 3;
+        float finalWidth = 1500;//width * 10 * 3;
+        float finalHeight = 1500;//height * 10 * 3;
         Mat res = new Mat(image, new Rect(0, 0, image.cols(), image.rows()));
 
 
@@ -124,9 +124,7 @@ public class ImageService {
             rectCrop = new Rect(0, offset, (int) finalWidth, res.height() - offset * 2);
         }
 
-        res = new Mat(res, rectCrop);
-
-        return res;
+        return new Mat(res, rectCrop);
     }
 
     // create border of the painting
