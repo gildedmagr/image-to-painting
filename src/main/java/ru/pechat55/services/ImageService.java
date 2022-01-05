@@ -46,20 +46,21 @@ public class ImageService {
 
         AtomicBoolean isImageRotated = new AtomicBoolean(false);
         // crop and rotate image
-        Mat preparedImage = prepareImageForPainting(image, isImageRotated, requestParam.getWidth(), requestParam.getHeight());
-
+        String preparedImage = prepareImageForPainting(image, isImageRotated, requestParam.getHost(), requestParam.getId());
+        image = Imgcodecs.imread(requestParam.getHost() + File.separator + preparedImage);
+        Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2BGRA);
         // create 3D painting
-        create3DPainting(preparedImage, requestParam.getHost(), requestParam.getId(), responseImages);
+        create3DPainting(image, requestParam.getHost(), requestParam.getId(), responseImages);
 
         // create model with prepared image
-       // PaintingModel paintingModel = new PaintingModel(requestParam.getWidth(), requestParam.getHeight(), image);
+        PaintingModel paintingModel = new PaintingModel(requestParam.getWidth(), requestParam.getHeight(), image);
 
         // create pictures with interior and painting
-        //createInteriorWithPainting(paintingModel, isImageRotated, requestParam.getHost(), requestParam.getId(), responseImages);
+        createInteriorWithPainting(paintingModel, isImageRotated, requestParam.getHost(), requestParam.getId(), responseImages);
 
 
         image.release();
-        preparedImage.release();
+        //preparedImage.release();
         image = null;
         preparedImage = null;
         long endTime = System.currentTimeMillis();
@@ -97,7 +98,7 @@ public class ImageService {
     }
 
     // crop and rotate image
-    private Mat prepareImageForPainting(Mat image, AtomicBoolean isImageRotated, int width, int height) {
+    private String prepareImageForPainting(Mat image, AtomicBoolean isImageRotated, String originHost, String productId) {
         float finalWidth = 1000;//width * 10 * 3;
         float finalHeight = 1000;//height * 10 * 3;
         Mat res = new Mat(image, new Rect(0, 0, image.cols(), image.rows()));
@@ -125,7 +126,15 @@ public class ImageService {
             offset = (int) (res.height() - finalHeight) / 2;
             rectCrop = new Rect(0, offset, (int) finalWidth, res.height() - offset * 2);
         }
-        return new Mat(res, rectCrop);
+        String fileName = "crop.png";
+        String filePath = "";
+        try {
+            filePath = Utils.saveImage(originHost, productId, fileName, Utils.mat2BufferedImage(new Mat(res, rectCrop)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+       // return new Mat(res, rectCrop);
+        return filePath;
     }
 
     // create border of the painting
