@@ -41,7 +41,6 @@ public class ImageService {
 
         //Mat image = Utils.urlToMat(url);
         Mat image = Imgcodecs.imread(requestParam.getHost() + File.separator + requestParam.getUrl());
-
         Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2BGRA);
 
         AtomicBoolean isImageRotated = new AtomicBoolean(false);
@@ -280,6 +279,7 @@ public class ImageService {
             e.printStackTrace();
             logger.error("Can't convert OpenCV matrix to buffered image", e);
         }
+/*
 
         // create the new image, canvas size is the max. of both image sizes
         int w = Math.max(image.getWidth(), border.getWidth());
@@ -297,9 +297,10 @@ public class ImageService {
         finalPictureGraphics.drawImage(image, (finalPicture.getWidth() - combined.getWidth()) / 2, (finalPicture.getHeight() - combined.getHeight()) / 2, null);
         finalPictureGraphics.drawImage(border, w + (finalPicture.getWidth() - combined.getWidth()) / 2, (finalPicture.getHeight() - combined.getHeight()) / 2, null);
         finalPictureGraphics.dispose();
+*/
 
         String fileName = "painting-3d.png";
-        String filePath = Utils.saveImage(serverPath, productId, fileName, finalPicture);
+        String filePath = Utils.saveImage(serverPath, productId, fileName, image);
         responseImages.add(filePath);
     }
 
