@@ -95,12 +95,12 @@ public class ImageService {
         // write points
         //drawTransformPoints(filenameFinalWithPoints, image, srcTri, dstTri);
 
-        Mat warpImage = Mat.zeros(image.rows(), image.cols(), CvType.CV_8U);
+        Mat warpImage = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
         Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
 
         Imgproc.warpPerspective(image, warpImage, warpMat, warpImage.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
-        Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(255, 255, 255, 200), 1);
-        Imgcodecs.imwrite("/var/www/demonstration/data/www/pechat.photo/image/painting/123456/warp.png", warpImage);
+        //Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(255, 255, 255, 200), 1);
+        //Imgcodecs.imwrite("/var/www/demonstration/data/www/pechat.photo/image/painting/123456/warp.png", warpImage);
         return warpImage;
     }
 
