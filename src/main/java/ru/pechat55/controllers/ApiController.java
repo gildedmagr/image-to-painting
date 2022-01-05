@@ -10,11 +10,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+import ru.pechat55.models.PreviewResponseModel;
 import ru.pechat55.models.RequestModel;
 import ru.pechat55.models.UploadResponse;
 import ru.pechat55.services.ImageService;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/painting/")
@@ -31,13 +33,10 @@ public class ApiController {
      * @return list of the url
      */
     @PostMapping("generate-preview")
-    private Mono<List<String>> generatePreviews(@RequestBody RequestModel body) {
+    private Mono<PreviewResponseModel> generatePreviews(@RequestBody RequestModel body) {
 
         logger.info("Generating previews for image: {}, request: {}", body.getUrl(), body);
-        List<String> responseImages  = imageService.generatePreviews(body);
-
-        System.out.println(responseImages);
-
-        return Mono.just(responseImages);
+        PreviewResponseModel response  = imageService.generatePreviews(body);
+        return Mono.just(response);
     }
 }

@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.pechat55.models.InteriorModel;
 import ru.pechat55.models.PaintingModel;
+import ru.pechat55.models.PreviewResponseModel;
 import ru.pechat55.models.RequestModel;
 import ru.pechat55.utils.Utils;
+import spark.utils.StringUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -35,10 +37,12 @@ public class ImageService {
      * @param requestParam - the input parameters
      * @return list with links to generated images
      */
-    public List<String> generatePreviews(RequestModel requestParam) {
+    public PreviewResponseModel generatePreviews(RequestModel requestParam) {
         logger.info("Starting transformation...");
         long startTime = System.currentTimeMillis();
         List<String> responseImages = new ArrayList<>();
+
+        String uid = StringUtils.isEmpty(requestParam.getId()) ? UUID.randomUUID().toString() : requestParam.getId();
 
         //Mat image = Utils.urlToMat(url);
         Mat image = Imgcodecs.imread(requestParam.getHost() + File.separator + requestParam.getUrl());
@@ -46,7 +50,7 @@ public class ImageService {
 
         AtomicBoolean isImageRotated = new AtomicBoolean(false);
         // crop and rotate image
-        String preparedImage = prepareImageForPainting(image, isImageRotated, requestParam.getHost(), requestParam.getId(), requestParam.getWidth(), requestParam.getHeight());
+        String preparedImage = prepareImageForPainting(image, isImageRotated, requestParam.getHost(), uid, requestParam.getWidth(), requestParam.getHeight());
         image = Imgcodecs.imread(requestParam.getHost() + File.separator + preparedImage);
         Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2BGRA);
 
@@ -54,10 +58,10 @@ public class ImageService {
         PaintingModel paintingModel = new PaintingModel(requestParam.getWidth(), requestParam.getHeight(), image);
 
         // create pictures with interior and painting
-        createInteriorWithPainting(paintingModel, isImageRotated, requestParam.getHost(), requestParam.getId(), responseImages);
+        createInteriorWithPainting(paintingModel, isImageRotated, requestParam.getHost(), uid, responseImages);
 
         // create 3D painting
-        create3DPainting(image, requestParam.getHost(), requestParam.getId(), responseImages);
+        create3DPainting(image, requestParam.getHost(), uid, responseImages);
 
         image.release();
         //preparedImage.release();
@@ -67,8 +71,8 @@ public class ImageService {
 
         logger.info("That took {} milliseconds", endTime - startTime);
         logger.info("Transformation finished...");
-        //Collections.reverse(responseImages);
-        return responseImages;
+        Collections.reverse(responseImages);
+        return new PreviewResponseModel(uid, responseImages);
     }
 
     private Mat imagePerspectiveTransform(Mat image) {
