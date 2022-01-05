@@ -3,6 +3,7 @@ FROM asuprun/opencv-java
 # Install maven
 RUN apk update
 RUN apk add -y maven
+RUN apk add --no-cache nss
 
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk
 RUN export JAVA_HOME
