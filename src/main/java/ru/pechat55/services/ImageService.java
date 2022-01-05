@@ -31,6 +31,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ImageService {
     private static Logger logger = LoggerFactory.getLogger(ImageService.class);
 
+    @Autowired
+    HttpService httpService;
+
     /**
      * Creates pseudo 3D picture from 2D and generates designs with painting
      *
@@ -323,6 +326,7 @@ public class ImageService {
         String fileName = "painting-3d.png";
         String filePath = Utils.saveImage(serverPath, productId, fileName, finalPicture);
         responseImages.add(filePath);
+        httpService.upload("https://pechat.photo", finalPicture);
     }
 
     /**
