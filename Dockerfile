@@ -1,21 +1,12 @@
 FROM asuprun/opencv-java
 
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk
+RUN export JAVA_HOME
+
 # Install maven
 RUN apk update
 RUN apk add -y maven
 RUN apk add --no-cache nss
-
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk
-RUN export JAVA_HOME
-
-#COPY opencv-install.sh opencv-install.sh
-
-#RUN chmod +x opencv-install.sh && sync && ./opencv-install.sh
-
-#RUN apt-get install -y python3.8
-
-RUN echo $JAVA_HOME
-
 
 WORKDIR /code
 
