@@ -107,8 +107,8 @@ public class ImageService {
         // picture is in landscape mode or square
         if (image.rows() <= image.cols()) {
             logger.info("Picture is in landscape mode, size: {}x{}", image.cols(), image.rows());
-            Core.rotate(image, res, Core.ROTATE_90_COUNTERCLOCKWISE);
-            isImageRotated.set(true);
+           // Core.rotate(image, res, Core.ROTATE_90_COUNTERCLOCKWISE);
+            //isImageRotated.set(true);
         }
 
 
