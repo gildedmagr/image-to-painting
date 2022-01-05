@@ -336,7 +336,7 @@ public class ImageService {
         // paint both images, preserving the alpha channels
         Graphics combinedGraphics = combined.createGraphics();
         combinedGraphics.drawImage(image, 0, 0, null);
-        combinedGraphics.drawImage(border, w + 10, 10, null);
+        combinedGraphics.drawImage(border, w, 0, null);
         combinedGraphics.dispose();
 
         BufferedImage finalPicture = createDropShadow(combined, 30);
