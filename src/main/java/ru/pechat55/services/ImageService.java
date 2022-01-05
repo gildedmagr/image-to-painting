@@ -331,11 +331,11 @@ public class ImageService {
         // create the new image, canvas size is the max. of both image sizes
         int w = Math.max(image.getWidth(), border.getWidth());
         int h = Math.max(image.getHeight(), border.getHeight());
-        BufferedImage combined = new BufferedImage(w+50, h+50, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage combined = new BufferedImage(w+10, h+10, BufferedImage.TYPE_INT_ARGB);
 
         // paint both images, preserving the alpha channels
         Graphics combinedGraphics = combined.createGraphics();
-        combinedGraphics.drawImage(image, 10, 10, null);
+        combinedGraphics.drawImage(image, 0, 0, null);
         combinedGraphics.drawImage(border, w + 10, 10, null);
         combinedGraphics.dispose();
 
