@@ -87,7 +87,7 @@ public class ImageService {
         Mat warpImage = Mat.zeros(image.rows(), image.cols(), CvType.CV_8U);
         Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
 
-        Imgproc.warpPerspective(image, warpImage, warpMat, warpImage.size(), Imgproc.INTER_LINEAR , Core.BORDER_TRANSPARENT);
+        Imgproc.warpPerspective(image, warpImage, warpMat, warpImage.size(), Imgproc.INTER_MAX , Core.BORDER_TRANSPARENT);
         Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(255, 255, 255, 200), 1);
         Imgcodecs.imwrite("/var/www/demonstration/data/www/pechat.photo/image/painting/123456/warp.png", warpImage);
         return warpImage;
