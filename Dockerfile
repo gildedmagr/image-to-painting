@@ -19,7 +19,6 @@ RUN echo $JAVA_HOME
 WORKDIR /code
 
 COPY target/pechat-canvas-1.0-SNAPSHOT.jar /code/app.jar
-COPY src/main/resources/images/test.jpg /code/test.jpg
 
 # Prepare by downloading dependencies
 ADD pom.xml /code/pom.xml
@@ -29,4 +28,4 @@ ADD src /code/src
 #RUN ["mvn", "package"]
 
 EXPOSE 27017
-#CMD ["java", "-jar", "target/pechat-canvas-1.0-SNAPSHOT.jar"]
+CMD ["java", "-jar", "app.jar"]
