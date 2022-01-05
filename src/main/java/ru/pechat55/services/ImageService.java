@@ -327,7 +327,6 @@ public class ImageService {
             e.printStackTrace();
             logger.error("Can't convert OpenCV matrix to buffered image", e);
         }
-        httpService.upload("https://pechat.photo", image);
 
         // create the new image, canvas size is the max. of both image sizes
         int w = Math.max(image.getWidth(), border.getWidth());
