@@ -3,7 +3,7 @@ package ru.pechat55.models;
 public class RequestModel {
     String url;
     String host;
-    String id;
+    String uid;
     int width;
     int height;
 
@@ -23,12 +23,12 @@ public class RequestModel {
         this.host = host;
     }
 
-    public String getId() {
-        return id;
+    public String getUid() {
+        return uid;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public int getWidth() {
@@ -52,7 +52,7 @@ public class RequestModel {
         return "RequestModel{" +
                 "url='" + url + '\'' +
                 ", host='" + host + '\'' +
-                ", id='" + id + '\'' +
+                ", uid='" + uid + '\'' +
                 ", width=" + width +
                 ", height=" + height +
                 '}';

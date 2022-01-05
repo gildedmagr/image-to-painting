@@ -42,7 +42,7 @@ public class ImageService {
         long startTime = System.currentTimeMillis();
         List<String> responseImages = new ArrayList<>();
 
-        String uid = StringUtils.isEmpty(requestParam.getId()) ? UUID.randomUUID().toString() : requestParam.getId();
+        String uid = requestParam.getUid() == null || "".equals(requestParam.getUid()) ? UUID.randomUUID().toString() : requestParam.getUid();
 
         //Mat image = Utils.urlToMat(url);
         Mat image = Imgcodecs.imread(requestParam.getHost() + File.separator + requestParam.getUrl());
