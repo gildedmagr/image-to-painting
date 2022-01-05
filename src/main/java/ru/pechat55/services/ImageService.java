@@ -94,25 +94,22 @@ public class ImageService {
 
         // write points
         //drawTransformPoints(filenameFinalWithPoints, image, srcTri, dstTri);
+        Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
 
         Mat warpImage = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
         Mat warpImage1 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
         Mat warpImage2 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
         Mat warpImage3 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
         Mat warpImage4 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
-        Mat warpImage5 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
-        Mat warpImage6 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
-        Mat warpImage7 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
-        Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
+
 
         Imgproc.warpPerspective(image, warpImage, warpMat, warpImage.size(), Imgproc.INTER_NEAREST, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         Imgproc.warpPerspective(image, warpImage1, warpMat, warpImage.size(), Imgproc.INTER_LINEAR, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         Imgproc.warpPerspective(image, warpImage2, warpMat, warpImage.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         Imgproc.warpPerspective(image, warpImage3, warpMat, warpImage.size(), Imgproc.INTER_AREA, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         Imgproc.warpPerspective(image, warpImage4, warpMat, warpImage.size(), Imgproc.INTER_LANCZOS4, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
-        //Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(255, 255, 255, 200), 1);
 
-
+        Imgproc.line(warpImage2, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(255, 255, 255, 200), 1);
         return warpImage2;
     }
 
@@ -197,8 +194,23 @@ public class ImageService {
 
         // perspective transformation
         Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
+
         Mat warpDst = Mat.zeros(border.rows(), border.cols(), CvType.CV_8U);
-        Imgproc.warpPerspective(border, warpDst, warpMat, warpDst.size(), Imgproc.INTER_CUBIC, Core.BORDER_CONSTANT, new Scalar(255, 255, 255, 255));
+        Mat warpImage = Mat.zeros(border.rows(), border.cols(), CvType.CV_16U);
+        Mat warpImage1 = Mat.zeros(border.rows(), border.cols(), CvType.CV_16U);
+        Mat warpImage2 = Mat.zeros(border.rows(), border.cols(), CvType.CV_16U);
+        Mat warpImage3 = Mat.zeros(border.rows(), border.cols(), CvType.CV_16U);
+        Mat warpImage4 = Mat.zeros(border.rows(), border.cols(), CvType.CV_16U);
+
+
+
+        Imgproc.warpPerspective(border, warpDst, warpMat, warpImage.size(), Imgproc.INTER_NEAREST, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(border, warpDst, warpMat, warpImage.size(), Imgproc.INTER_LINEAR, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(border, warpDst, warpMat, warpImage.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(border, warpDst, warpMat, warpImage.size(), Imgproc.INTER_AREA, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(border, warpDst, warpMat, warpImage.size(), Imgproc.INTER_LANCZOS4, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+
+
         return warpDst;
     }
 
