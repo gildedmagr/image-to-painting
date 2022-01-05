@@ -109,7 +109,7 @@ public class ImageService {
         Imgproc.warpPerspective(image, warpImage3, warpMat, warpImage.size(), Imgproc.INTER_AREA, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         Imgproc.warpPerspective(image, warpImage4, warpMat, warpImage.size(), Imgproc.INTER_LANCZOS4, Core.BORDER_CONSTANT, new Scalar(255, 255, 255, 255));
 
-        Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(155, 155, 155), 1);
+        Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(155, 155, 155, 100), 1);
         return warpImage;
     }
 
@@ -197,7 +197,7 @@ public class ImageService {
 
         Mat warpDst = Mat.zeros(border.rows(), border.cols(), CvType.CV_16U);
 
-        Imgproc.warpPerspective(border, warpDst, warpMat, warpDst.size(), Imgproc.INTER_NEAREST, Core.BORDER_CONSTANT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(border, warpDst, warpMat, warpDst.size(), Imgproc.INTER_CUBIC, Core.BORDER_CONSTANT, new Scalar(255, 255, 255, 255));
 
         return warpDst;
     }
