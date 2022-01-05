@@ -57,7 +57,8 @@ public class ImageService {
         createInteriorWithPainting(paintingModel, isImageRotated, requestParam.getHost(), requestParam.getId(), responseImages);
 
 
-
+        image.release();
+        image = null;
         long endTime = System.currentTimeMillis();
 
         logger.info("That took {} milliseconds", endTime - startTime);
