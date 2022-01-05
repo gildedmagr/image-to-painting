@@ -78,41 +78,6 @@ public class ImageService {
         return new PreviewResponseModel(uid, responseImages);
     }
 
-    private Mat imagePerspectiveTransform(Mat image) {
-        Point[] srcTri = new Point[4];
-        srcTri[0] = new Point(0, 0);
-        srcTri[1] = new Point(image.cols() - 1, 0);
-        srcTri[2] = new Point(image.cols() - 1, image.rows() - 1);
-        srcTri[3] = new Point(0, image.rows() - 1);
-
-
-        Point[] dstTri = new Point[4];
-        dstTri[0] = new Point(50, 40);
-        dstTri[1] = new Point(image.cols() - 1, 0);
-        dstTri[2] = new Point(image.cols() - 1, image.rows() - 1);
-        dstTri[3] = new Point(50, image.rows() - 60);
-
-        // write points
-        //drawTransformPoints(filenameFinalWithPoints, image, srcTri, dstTri);
-        Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
-
-        Mat warpImage = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
-        Mat warpImage1 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
-        Mat warpImage2 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
-        Mat warpImage3 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
-        Mat warpImage4 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
-
-
-        Imgproc.warpPerspective(image, warpImage, warpMat, warpImage.size(), Imgproc.INTER_CUBIC, Core.BORDER_CONSTANT, new Scalar(255, 255, 255, 255));
-        Imgproc.warpPerspective(image, warpImage1, warpMat, warpImage.size(), Imgproc.INTER_LINEAR, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
-        Imgproc.warpPerspective(image, warpImage2, warpMat, warpImage.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
-        Imgproc.warpPerspective(image, warpImage3, warpMat, warpImage.size(), Imgproc.INTER_AREA, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
-        Imgproc.warpPerspective(image, warpImage4, warpMat, warpImage.size(), Imgproc.INTER_LANCZOS4, Core.BORDER_CONSTANT, new Scalar(255, 255, 255, 255));
-
-        Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(0, 0, 0, 205), 1);
-        return warpImage;
-    }
-
     // crop and rotate image
     private String prepareImageForPainting(Mat image, AtomicBoolean isImageRotated, String originHost, String productId, int width, int height) {
 
@@ -158,8 +123,43 @@ public class ImageService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-       // return new Mat(res, rectCrop);
+        // return new Mat(res, rectCrop);
         return filePath;
+    }
+
+    private Mat imagePerspectiveTransform(Mat image) {
+        Point[] srcTri = new Point[4];
+        srcTri[0] = new Point(0, 0);
+        srcTri[1] = new Point(image.cols() - 1, 0);
+        srcTri[2] = new Point(image.cols() - 1, image.rows() - 1);
+        srcTri[3] = new Point(0, image.rows() - 1);
+
+
+        Point[] dstTri = new Point[4];
+        dstTri[0] = new Point(50, 40);
+        dstTri[1] = new Point(image.cols() - 1, 0);
+        dstTri[2] = new Point(image.cols() - 1, image.rows() - 1);
+        dstTri[3] = new Point(50, image.rows() - 60);
+
+        // write points
+        //drawTransformPoints(filenameFinalWithPoints, image, srcTri, dstTri);
+        Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
+
+        Mat warpImage = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
+        Mat warpImage1 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
+        Mat warpImage2 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
+        Mat warpImage3 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
+        Mat warpImage4 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
+
+
+        Imgproc.warpPerspective(image, warpImage, warpMat, warpImage.size(), Imgproc.INTER_CUBIC, Core.BORDER_CONSTANT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(image, warpImage1, warpMat, warpImage.size(), Imgproc.INTER_LINEAR, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(image, warpImage2, warpMat, warpImage.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(image, warpImage3, warpMat, warpImage.size(), Imgproc.INTER_AREA, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(image, warpImage4, warpMat, warpImage.size(), Imgproc.INTER_LANCZOS4, Core.BORDER_CONSTANT, new Scalar(255, 255, 255, 255));
+
+        Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(0, 0, 0, 205), 1);
+        return warpImage;
     }
 
     // create border of the painting
@@ -176,7 +176,7 @@ public class ImageService {
         // flip horizontally
         Core.flip(border, border, 1);
         // decrease brightness
-        border.convertTo(border, -1, 1, -20);
+        border.convertTo(border, -1, 1, 0);
 
         // perspective transformation points
         Point[] srcTri = new Point[4];
