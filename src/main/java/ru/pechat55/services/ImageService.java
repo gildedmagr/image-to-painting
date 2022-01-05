@@ -110,19 +110,18 @@ public class ImageService {
         Imgproc.warpPerspective(image, warpImage2, warpMat, warpImage.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         Imgproc.warpPerspective(image, warpImage3, warpMat, warpImage.size(), Imgproc.INTER_AREA, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         Imgproc.warpPerspective(image, warpImage4, warpMat, warpImage.size(), Imgproc.INTER_LANCZOS4, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
-        Imgproc.warpPerspective(image, warpImage5, warpMat, warpImage.size(), Imgproc.INTER_LINEAR_EXACT, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         Imgproc.warpPerspective(image, warpImage6, warpMat, warpImage.size(), Imgproc.INTER_MAX, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         //Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(255, 255, 255, 200), 1);
 
         try {
-            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w1.png", Utils.mat2BufferedImage(warpImage));
+            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w0.png", Utils.mat2BufferedImage(warpImage));
             Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w1.png", Utils.mat2BufferedImage(warpImage1));
-            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w1.png", Utils.mat2BufferedImage(warpImage2));
-            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w1.png", Utils.mat2BufferedImage(warpImage3));
-            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w1.png", Utils.mat2BufferedImage(warpImage4));
-            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w1.png", Utils.mat2BufferedImage(warpImage5));
-            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w1.png", Utils.mat2BufferedImage(warpImage6));
-            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w1.png", Utils.mat2BufferedImage(warpImage7));
+            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w2.png", Utils.mat2BufferedImage(warpImage2));
+            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w3.png", Utils.mat2BufferedImage(warpImage3));
+            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w4.png", Utils.mat2BufferedImage(warpImage4));
+            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w5.png", Utils.mat2BufferedImage(warpImage5));
+            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w6.png", Utils.mat2BufferedImage(warpImage6));
+            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w7.png", Utils.mat2BufferedImage(warpImage7));
         } catch (IOException e) {
             e.printStackTrace();
         }
