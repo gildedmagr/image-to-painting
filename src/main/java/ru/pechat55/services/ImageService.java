@@ -97,8 +97,8 @@ public class ImageService {
 
     // crop and rotate image
     private Mat prepareImageForPainting(Mat image, AtomicBoolean isImageRotated, int width, int height) {
-        float finalWidth = 15000;//width * 10 * 3;
-        float finalHeight = 15000;//height * 10 * 3;
+        float finalWidth = 1000;//width * 10 * 3;
+        float finalHeight = 1000;//height * 10 * 3;
         Mat res = new Mat(image, new Rect(0, 0, image.cols(), image.rows()));
 
 
@@ -110,7 +110,7 @@ public class ImageService {
         }
 
         float max = Math.max(finalWidth / (float) res.width(), finalHeight / (float) res.height());
-        Imgproc.resize(res, res, new Size(res.width() * max, res.height() * max), 0, 0, Imgproc.INTER_AREA);
+        Imgproc.resize(res, res, new Size(res.width() * max, res.height() * max), 0, 0, Imgproc.INTER_CUBIC);
 
 
         int offset;
