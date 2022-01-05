@@ -26,7 +26,7 @@ ADD pom.xml /code/pom.xml
 
 # Adding source, compile and package into a fat jar
 ADD src /code/src
-#RUN ["mvn", "package"]
+RUN ["mvn", "package"]
 
 EXPOSE 27017
 CMD ["java", "-jar", "app.jar"]
