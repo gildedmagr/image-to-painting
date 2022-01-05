@@ -96,11 +96,37 @@ public class ImageService {
         //drawTransformPoints(filenameFinalWithPoints, image, srcTri, dstTri);
 
         Mat warpImage = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
+        Mat warpImage1 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
+        Mat warpImage2 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
+        Mat warpImage3 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
+        Mat warpImage4 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
+        Mat warpImage5 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
+        Mat warpImage6 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
+        Mat warpImage7 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
         Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
 
-        Imgproc.warpPerspective(image, warpImage, warpMat, warpImage.size(), Imgproc.INTER_AREA, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(image, warpImage, warpMat, warpImage.size(), Imgproc.INTER_NEAREST, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(image, warpImage1, warpMat, warpImage.size(), Imgproc.INTER_LINEAR, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(image, warpImage2, warpMat, warpImage.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(image, warpImage3, warpMat, warpImage.size(), Imgproc.INTER_AREA, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(image, warpImage4, warpMat, warpImage.size(), Imgproc.INTER_LANCZOS4, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(image, warpImage5, warpMat, warpImage.size(), Imgproc.INTER_LINEAR_EXACT, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(image, warpImage6, warpMat, warpImage.size(), Imgproc.INTER_NEAREST_EXACT, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(image, warpImage7, warpMat, warpImage.size(), Imgproc.INTER_MAX, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         //Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(255, 255, 255, 200), 1);
-        Imgcodecs.imwrite("/var/www/demonstration/data/www/pechat.photo/image/painting/123456/warp.png", warpImage);
+
+        try {
+            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w1.png", Utils.mat2BufferedImage(warpImage));
+            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w1.png", Utils.mat2BufferedImage(warpImage1));
+            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w1.png", Utils.mat2BufferedImage(warpImage2));
+            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w1.png", Utils.mat2BufferedImage(warpImage3));
+            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w1.png", Utils.mat2BufferedImage(warpImage4));
+            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w1.png", Utils.mat2BufferedImage(warpImage5));
+            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w1.png", Utils.mat2BufferedImage(warpImage6));
+            Utils.saveImage("/var/www/demonstration/data/www/pechat.photo", "1111", "w1.png", Utils.mat2BufferedImage(warpImage7));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return warpImage;
     }
 
