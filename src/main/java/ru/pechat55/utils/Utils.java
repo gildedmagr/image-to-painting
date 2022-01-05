@@ -94,12 +94,12 @@ public class Utils {
         byte[] pixels = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData();
 
         logger.info(bufferedImage.getWidth() + " " + bufferedImage.getHeight());
-        Mat image = Mat.zeros(bufferedImage.getWidth(), bufferedImage.getHeight(), CvType.CV_8U);
-        //image.put(bufferedImage.getWidth(), bufferedImage.getHeight(), pixels);
+
+        String extension = bufferedImage.getType() == BufferedImage.TYPE_INT_RGB ? "JPG" : "PNG";
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try {
-            ImageIO.write(bufferedImage, "jpg", byteArrayOutputStream);
+            ImageIO.write(bufferedImage, extension, byteArrayOutputStream);
             byteArrayOutputStream.flush();
         } catch (IOException e) {
             logger.error("Can't convert buffered image to OpenCV matrix", e);
@@ -107,8 +107,7 @@ public class Utils {
         }
 
 
-        image = Imgcodecs.imdecode(new MatOfByte(byteArrayOutputStream.toByteArray()), Imgcodecs.IMREAD_COLOR);
-        return image;
+        return Imgcodecs.imdecode(new MatOfByte(byteArrayOutputStream.toByteArray()), Imgcodecs.IMREAD_COLOR);
     }
 
     /**
