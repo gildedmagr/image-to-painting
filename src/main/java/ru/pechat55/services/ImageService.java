@@ -88,6 +88,7 @@ public class ImageService {
 
         Imgproc.warpPerspective(image, warpImage, warpMat, warpImage.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(255, 255, 255, 200), 1);
+        Imgcodecs.imwrite("/var/www/demonstration/data/www/pechat.photo/image/painting/123456/warp.png", warpImage);
         return warpImage;
     }
 
