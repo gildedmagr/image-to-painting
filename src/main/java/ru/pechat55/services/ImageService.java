@@ -52,10 +52,10 @@ public class ImageService {
         create3DPainting(preparedImage, requestParam.getHost(), requestParam.getId(), responseImages);
 
         // create model with prepared image
-        PaintingModel paintingModel = new PaintingModel(requestParam.getWidth(), requestParam.getHeight(), image);
+       // PaintingModel paintingModel = new PaintingModel(requestParam.getWidth(), requestParam.getHeight(), image);
 
         // create pictures with interior and painting
-        createInteriorWithPainting(paintingModel, isImageRotated, requestParam.getHost(), requestParam.getId(), responseImages);
+        //createInteriorWithPainting(paintingModel, isImageRotated, requestParam.getHost(), requestParam.getId(), responseImages);
 
 
         image.release();
@@ -90,7 +90,7 @@ public class ImageService {
         Mat warpImage = Mat.zeros(image.rows(), image.cols(), CvType.CV_8U);
         Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
 
-        Imgproc.warpPerspective(image, warpImage, warpMat, warpImage.size(), Imgproc.INTER_LINEAR, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(image, warpImage, warpMat, warpImage.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(255, 255, 255, 200), 1);
         Imgcodecs.imwrite("/var/www/demonstration/data/www/pechat.photo/image/painting/123456/warp.png", warpImage);
         return warpImage;
@@ -98,11 +98,9 @@ public class ImageService {
 
     // crop and rotate image
     private Mat prepareImageForPainting(Mat image, AtomicBoolean isImageRotated, int width, int height) {
-        float finalWidth = 2000;//width * 10 * 3;
-        float finalHeight = 2000;//height * 10 * 3;
+        float finalWidth = 1000;//width * 10 * 3;
+        float finalHeight = 1000;//height * 10 * 3;
         Mat res = new Mat(image, new Rect(0, 0, image.cols(), image.rows()));
-
-
 
         // picture is in landscape mode or square
         if (image.rows() <= image.cols()) {
@@ -111,17 +109,9 @@ public class ImageService {
             isImageRotated.set(true);
         }
 
-
-
         float max = Math.max(finalWidth / (float) res.width(), finalHeight / (float) res.height());
         Imgproc.resize(res, res, new Size(res.width() * max, res.height() * max), 0, 0, Imgproc.INTER_CUBIC);
 
-     /*   BufferedImage thumbnail = null;
-        try {
-            thumbnail =  Thumbnails.of(Utils.mat2BufferedImage(res)).size((int)(res.width() * max), (int)(res.height() * max)).asBufferedImage();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
 
         int offset;
         Rect rectCrop = null;
@@ -135,13 +125,7 @@ public class ImageService {
             offset = (int) (res.height() - finalHeight) / 2;
             rectCrop = new Rect(0, offset, (int) finalWidth, res.height() - offset * 2);
         }
-
-        //return Utils.bufferedImageToMat(cropImage(thumbnail, rectCrop));
         return new Mat(res, rectCrop);
-    }
-
-    private BufferedImage cropImage(BufferedImage src, Rect rect) {
-        return src.getSubimage(0, 0, rect.width, rect.height);
     }
 
     // create border of the painting
@@ -297,6 +281,7 @@ public class ImageService {
             logger.error("Can't convert OpenCV matrix to buffered image", e);
         }
 
+
         // create the new image, canvas size is the max. of both image sizes
         int w = Math.max(image.getWidth(), border.getWidth());
         int h = Math.max(image.getHeight(), border.getHeight());
@@ -314,8 +299,9 @@ public class ImageService {
         finalPictureGraphics.drawImage(border, w + (finalPicture.getWidth() - combined.getWidth()) / 2, (finalPicture.getHeight() - combined.getHeight()) / 2, null);
         finalPictureGraphics.dispose();
 
+
         String fileName = "painting-3d.png";
-        String filePath = Utils.saveImage(serverPath, productId, fileName, image);
+        String filePath = Utils.saveImage(serverPath, productId, fileName, finalPicture);
         responseImages.add(filePath);
     }
 
