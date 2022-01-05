@@ -208,7 +208,7 @@ public class ImageService {
         Imgproc.warpPerspective(border, warpDst1, warpMat, warpDst.size(), Imgproc.INTER_LINEAR, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         Imgproc.warpPerspective(border, warpDst2, warpMat, warpDst.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         Imgproc.warpPerspective(border, warpDst3, warpMat, warpDst.size(), Imgproc.INTER_AREA, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
-        Imgproc.warpPerspective(border, warpDst4, warpMat, warpDst.size(), Imgproc.INTER_LANCZOS4, Core.BORDER_CONSTANT, new Scalar(255, 255, 255, 255));
+        Imgproc.warpPerspective(border, warpDst4, warpMat, warpDst.size(), Imgproc.INTER_LANCZOS4, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
 
 
         return warpDst4;
