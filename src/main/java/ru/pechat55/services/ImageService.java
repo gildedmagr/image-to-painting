@@ -134,32 +134,29 @@ public class ImageService {
         srcTri[2] = new Point(image.cols() - 1, image.rows() - 1);
         srcTri[3] = new Point(0, image.rows() - 1);
 
-
+        int warpByXAxis = 50;
+        int warpByYAxisTop = 40;
+        int warpByYAxisBottom = 60;
         Point[] dstTri = new Point[4];
-        dstTri[0] = new Point(50, 40);
+        dstTri[0] = new Point(warpByXAxis, warpByYAxisTop);
         dstTri[1] = new Point(image.cols() - 1, 0);
         dstTri[2] = new Point(image.cols() - 1, image.rows() - 1);
-        dstTri[3] = new Point(50, image.rows() - 60);
+        dstTri[3] = new Point(warpByXAxis, image.rows() - warpByYAxisBottom);
 
         // write points
         //drawTransformPoints(filenameFinalWithPoints, image, srcTri, dstTri);
         Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
 
         Mat warpImage = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
-        Mat warpImage1 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
-        Mat warpImage2 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
-        Mat warpImage3 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
-        Mat warpImage4 = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
+
 
 
         Imgproc.warpPerspective(image, warpImage, warpMat, warpImage.size(), Imgproc.INTER_CUBIC, Core.BORDER_CONSTANT, new Scalar(255, 255, 255, 255));
-        Imgproc.warpPerspective(image, warpImage1, warpMat, warpImage.size(), Imgproc.INTER_LINEAR, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
-        Imgproc.warpPerspective(image, warpImage2, warpMat, warpImage.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
-        Imgproc.warpPerspective(image, warpImage3, warpMat, warpImage.size(), Imgproc.INTER_AREA, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
-        Imgproc.warpPerspective(image, warpImage4, warpMat, warpImage.size(), Imgproc.INTER_LANCZOS4, Core.BORDER_CONSTANT, new Scalar(255, 255, 255, 255));
+
 
         Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(255, 255, 255, 50), 1);
-        return warpImage;
+        Rect rectCrop = new Rect(warpByXAxis, 0, image.width() - warpByXAxis, image.rows());
+        return new Mat(warpImage, rectCrop);
     }
 
     // create border of the painting
