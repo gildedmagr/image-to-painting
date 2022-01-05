@@ -1,5 +1,6 @@
 package ru.pechat55.services;
 
+import net.coobird.thumbnailator.Thumbnails;
 import org.opencv.core.*;
 import org.opencv.core.Point;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -102,6 +103,7 @@ public class ImageService {
         Mat res = new Mat(image, new Rect(0, 0, image.cols(), image.rows()));
 
 
+
         // picture is in landscape mode or square
         if (image.rows() <= image.cols()) {
             logger.info("Picture is in landscape mode, size: {}x{}", image.cols(), image.rows());
@@ -109,9 +111,17 @@ public class ImageService {
             isImageRotated.set(true);
         }
 
-        float max = Math.max(finalWidth / (float) res.width(), finalHeight / (float) res.height());
-        Imgproc.resize(res, res, new Size(res.width() * max, res.height() * max), 0, 0, Imgproc.INTER_CUBIC);
 
+
+        float max = Math.max(finalWidth / (float) res.width(), finalHeight / (float) res.height());
+        //Imgproc.resize(res, res, new Size(res.width() * max, res.height() * max), 0, 0, Imgproc.INTER_CUBIC);
+
+        BufferedImage thumbnail = null;
+        try {
+            thumbnail =  Thumbnails.of(Utils.mat2BufferedImage(res)).size((int)(res.width() * max), (int)(res.height() * max)).asBufferedImage();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         int offset;
         Rect rectCrop = null;
@@ -125,7 +135,13 @@ public class ImageService {
             offset = (int) (res.height() - finalHeight) / 2;
             rectCrop = new Rect(0, offset, (int) finalWidth, res.height() - offset * 2);
         }
-        return new Mat(res, rectCrop);
+
+        return Utils.bufferedImageToMat(cropImage(thumbnail, rectCrop));
+        //return new Mat(res, rectCrop);
+    }
+
+    private BufferedImage cropImage(BufferedImage src, Rect rect) {
+        return src.getSubimage(0, 0, rect.width, rect.height);
     }
 
     // create border of the painting
