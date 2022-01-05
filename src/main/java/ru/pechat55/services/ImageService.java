@@ -300,7 +300,7 @@ public class ImageService {
 */
 
         String fileName = "painting-3d.png";
-        String filePath = Utils.saveImage(serverPath, productId, fileName, image);
+        String filePath = Utils.saveImage(serverPath, productId, fileName, border);
         responseImages.add(filePath);
     }
 
