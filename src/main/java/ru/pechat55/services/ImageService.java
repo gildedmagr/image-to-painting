@@ -45,7 +45,7 @@ public class ImageService {
 
         AtomicBoolean isImageRotated = new AtomicBoolean(false);
         // crop and rotate image
-        image = prepareImageForPainting(image, isImageRotated, requestParam.getWidth(), requestParam.getHeight());
+        //image = prepareImageForPainting(image, isImageRotated, requestParam.getWidth(), requestParam.getHeight());
 
         // create 3D painting
         create3DPainting(image, requestParam.getHost(), requestParam.getId(), responseImages);
@@ -87,7 +87,7 @@ public class ImageService {
         Mat warpImage = Mat.zeros(image.rows(), image.cols(), CvType.CV_8U);
         Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
 
-        Imgproc.warpPerspective(image, warpImage, warpMat, warpImage.size(), Imgproc.INTER_MAX , Core.BORDER_TRANSPARENT);
+        Imgproc.warpPerspective(image, warpImage, warpMat, warpImage.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(255, 255, 255, 200), 1);
         Imgcodecs.imwrite("/var/www/demonstration/data/www/pechat.photo/image/painting/123456/warp.png", warpImage);
         return warpImage;
