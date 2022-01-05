@@ -36,7 +36,7 @@ public class RequestModel {
     }
 
     public void setWidth(int width) {
-        this.width = width;
+        this.width = width / 10;
     }
 
     public int getHeight() {
@@ -44,7 +44,7 @@ public class RequestModel {
     }
 
     public void setHeight(int height) {
-        this.height = height;
+        this.height = height / 10;
     }
 
     @Override

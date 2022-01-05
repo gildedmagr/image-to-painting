@@ -46,11 +46,9 @@ public class ImageService {
 
         AtomicBoolean isImageRotated = new AtomicBoolean(false);
         // crop and rotate image
-        String preparedImage = prepareImageForPainting(image, isImageRotated, requestParam.getHost(), requestParam.getId());
+        String preparedImage = prepareImageForPainting(image, isImageRotated, requestParam.getHost(), requestParam.getId(), requestParam.getWidth(), requestParam.getHeight());
         image = Imgcodecs.imread(requestParam.getHost() + File.separator + preparedImage);
         Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2BGRA);
-        // create 3D painting
-        create3DPainting(image, requestParam.getHost(), requestParam.getId(), responseImages);
 
         // create model with prepared image
         PaintingModel paintingModel = new PaintingModel(requestParam.getWidth(), requestParam.getHeight(), image);
@@ -58,6 +56,8 @@ public class ImageService {
         // create pictures with interior and painting
         createInteriorWithPainting(paintingModel, isImageRotated, requestParam.getHost(), requestParam.getId(), responseImages);
 
+        // create 3D painting
+        create3DPainting(image, requestParam.getHost(), requestParam.getId(), responseImages);
 
         image.release();
         //preparedImage.release();
@@ -98,9 +98,16 @@ public class ImageService {
     }
 
     // crop and rotate image
-    private String prepareImageForPainting(Mat image, AtomicBoolean isImageRotated, String originHost, String productId) {
-        float finalWidth = 1000;//width * 10 * 3;
-        float finalHeight = 1000;//height * 10 * 3;
+    private String prepareImageForPainting(Mat image, AtomicBoolean isImageRotated, String originHost, String productId, int width, int height) {
+
+        //width = width * 30 ;
+        //height = height * 30;
+
+        float maxSide = Math.min(width, height);
+
+        float finalWidth = width / (maxSide / 500);//width * 10 * 3; 80 * 10 * 3 = 2400
+        float finalHeight = height / (maxSide / 500);//height * 10 * 3; 100 * 10 * 3 = 3000
+
         Mat res = new Mat(image, new Rect(0, 0, image.cols(), image.rows()));
 
         // picture is in landscape mode or square
@@ -111,6 +118,7 @@ public class ImageService {
         }
 
         float max = Math.max(finalWidth / (float) res.width(), finalHeight / (float) res.height());
+        logger.info("Resize image: {}x{}", res.width() * max, res.height() * max);
         Imgproc.resize(res, res, new Size(res.width() * max, res.height() * max), 0, 0, Imgproc.INTER_CUBIC);
 
 
@@ -128,6 +136,7 @@ public class ImageService {
         }
         String fileName = "crop.png";
         String filePath = "";
+
         try {
             filePath = Utils.saveImage(originHost, productId, fileName, Utils.mat2BufferedImage(new Mat(res, rectCrop)));
         } catch (IOException e) {
@@ -228,7 +237,7 @@ public class ImageService {
 
         logger.info("Picture height: {}", croppedImage.height());
         float percentOfNumber = (float) paintingModel.getHeight() / interiorWall.getWallHeight() * 100;
-        if (percentOfNumber >= 50) {
+        if (percentOfNumber >= 30) {
             percentOfNumber *= 0.7;
         }
         float pixelsForPicture = (float) h / 100 * percentOfNumber;
