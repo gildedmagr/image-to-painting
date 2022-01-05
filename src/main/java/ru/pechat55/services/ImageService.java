@@ -45,7 +45,7 @@ public class ImageService {
 
         AtomicBoolean isImageRotated = new AtomicBoolean(false);
         // crop and rotate image
-        //image = prepareImageForPainting(image, isImageRotated, requestParam.getWidth(), requestParam.getHeight());
+        image = prepareImageForPainting(image, isImageRotated, requestParam.getWidth(), requestParam.getHeight());
 
         // create 3D painting
         create3DPainting(image, requestParam.getHost(), requestParam.getId(), responseImages);
@@ -124,6 +124,11 @@ public class ImageService {
             rectCrop = new Rect(0, offset, (int) finalWidth, res.height() - offset * 2);
         }
 
+        try {
+            return Utils.bufferedImageToMat(Utils.mat2BufferedImage(new Mat(res, rectCrop)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return new Mat(res, rectCrop);
     }
 
