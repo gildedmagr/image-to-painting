@@ -158,7 +158,7 @@ public class ImageService {
         Imgproc.warpPerspective(image, warpImage3, warpMat, warpImage.size(), Imgproc.INTER_AREA, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         Imgproc.warpPerspective(image, warpImage4, warpMat, warpImage.size(), Imgproc.INTER_LANCZOS4, Core.BORDER_CONSTANT, new Scalar(255, 255, 255, 255));
 
-        Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(0, 0, 0, 150), 1);
+        Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(255, 255, 255, 50), 1);
         return warpImage;
     }
 
@@ -319,7 +319,7 @@ public class ImageService {
         // create the new image, canvas size is the max. of both image sizes
         int w = Math.max(image.getWidth(), border.getWidth());
         int h = Math.max(image.getHeight(), border.getHeight());
-        BufferedImage combined = new BufferedImage(w + border.getWidth(), h, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage combined = new BufferedImage(w + border.getWidth(), h, BufferedImage.TYPE_INT_RGB);
 
         // paint both images, preserving the alpha channels
         Graphics combinedGraphics = combined.createGraphics();
