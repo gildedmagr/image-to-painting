@@ -176,7 +176,7 @@ public class ImageService {
         // flip horizontally
         Core.flip(border, border, 1);
         // decrease brightness
-        border.convertTo(border, -1, 1, 0);
+        border.convertTo(border, -1, 0.5, 0);
 
         // perspective transformation points
         Point[] srcTri = new Point[4];
