@@ -52,10 +52,10 @@ public class ImageService {
         create3DPainting(preparedImage, requestParam.getHost(), requestParam.getId(), responseImages);
 
         // create model with prepared image
-       // PaintingModel paintingModel = new PaintingModel(requestParam.getWidth(), requestParam.getHeight(), image);
+        PaintingModel paintingModel = new PaintingModel(requestParam.getWidth(), requestParam.getHeight(), image);
 
         // create pictures with interior and painting
-        //createInteriorWithPainting(paintingModel, isImageRotated, requestParam.getHost(), requestParam.getId(), responseImages);
+        createInteriorWithPainting(paintingModel, isImageRotated, requestParam.getHost(), requestParam.getId(), responseImages);
 
 
         image.release();
@@ -296,7 +296,6 @@ public class ImageService {
             e.printStackTrace();
             logger.error("Can't convert OpenCV matrix to buffered image", e);
         }
-/*
 
         // create the new image, canvas size is the max. of both image sizes
         int w = Math.max(image.getWidth(), border.getWidth());
@@ -314,7 +313,6 @@ public class ImageService {
         finalPictureGraphics.drawImage(image, (finalPicture.getWidth() - combined.getWidth()) / 2, (finalPicture.getHeight() - combined.getHeight()) / 2, null);
         finalPictureGraphics.drawImage(border, w + (finalPicture.getWidth() - combined.getWidth()) / 2, (finalPicture.getHeight() - combined.getHeight()) / 2, null);
         finalPictureGraphics.dispose();
-*/
 
         String fileName = "painting-3d.png";
         String filePath = Utils.saveImage(serverPath, productId, fileName, image);
