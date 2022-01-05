@@ -108,8 +108,6 @@ public class ImageService {
         Imgproc.warpPerspective(image, warpImage, warpMat, warpImage.size(), Imgproc.INTER_NEAREST, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         Imgproc.warpPerspective(image, warpImage1, warpMat, warpImage.size(), Imgproc.INTER_LINEAR, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         Imgproc.warpPerspective(image, warpImage2, warpMat, warpImage.size(), Imgproc.INTER_CUBIC, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
-        Imgproc.warpPerspective(image, warpImage3, warpMat, warpImage.size(), Imgproc.INTER_AREA, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
-        Imgproc.warpPerspective(image, warpImage4, warpMat, warpImage.size(), Imgproc.INTER_LANCZOS4, Core.BORDER_TRANSPARENT, new Scalar(255, 255, 255, 255));
         //Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(255, 255, 255, 200), 1);
 
         try {
@@ -124,7 +122,7 @@ public class ImageService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return warpImage4;
+        return warpImage2;
     }
 
     // crop and rotate image
