@@ -98,8 +98,8 @@ public class ImageService {
 
     // crop and rotate image
     private Mat prepareImageForPainting(Mat image, AtomicBoolean isImageRotated, int width, int height) {
-        float finalWidth = 1000;//width * 10 * 3;
-        float finalHeight = 1000;//height * 10 * 3;
+        float finalWidth = 2000;//width * 10 * 3;
+        float finalHeight = 2000;//height * 10 * 3;
         Mat res = new Mat(image, new Rect(0, 0, image.cols(), image.rows()));
 
 
@@ -107,8 +107,8 @@ public class ImageService {
         // picture is in landscape mode or square
         if (image.rows() <= image.cols()) {
             logger.info("Picture is in landscape mode, size: {}x{}", image.cols(), image.rows());
-           // Core.rotate(image, res, Core.ROTATE_90_COUNTERCLOCKWISE);
-            //isImageRotated.set(true);
+            Core.rotate(image, res, Core.ROTATE_90_COUNTERCLOCKWISE);
+            isImageRotated.set(true);
         }
 
 
