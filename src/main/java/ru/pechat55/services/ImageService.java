@@ -124,7 +124,7 @@ public class ImageService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return warpImage;
+        return warpImage4;
     }
 
     // crop and rotate image
