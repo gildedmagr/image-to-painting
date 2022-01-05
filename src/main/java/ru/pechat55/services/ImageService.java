@@ -45,7 +45,7 @@ public class ImageService {
 
         AtomicBoolean isImageRotated = new AtomicBoolean(false);
         // crop and rotate image
-        image = prepareImageForPainting(image, isImageRotated, requestParam.getWidth(), requestParam.getHeight());
+        //image = prepareImageForPainting(image, isImageRotated, requestParam.getWidth(), requestParam.getHeight());
 
         // create 3D painting
         create3DPainting(image, requestParam.getHost(), requestParam.getId(), responseImages);
