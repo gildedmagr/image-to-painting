@@ -114,14 +114,14 @@ public class ImageService {
 
 
         float max = Math.max(finalWidth / (float) res.width(), finalHeight / (float) res.height());
-        //Imgproc.resize(res, res, new Size(res.width() * max, res.height() * max), 0, 0, Imgproc.INTER_CUBIC);
+        Imgproc.resize(res, res, new Size(res.width() * max, res.height() * max), 0, 0, Imgproc.INTER_CUBIC);
 
-        BufferedImage thumbnail = null;
+     /*   BufferedImage thumbnail = null;
         try {
             thumbnail =  Thumbnails.of(Utils.mat2BufferedImage(res)).size((int)(res.width() * max), (int)(res.height() * max)).asBufferedImage();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         int offset;
         Rect rectCrop = null;
@@ -136,8 +136,8 @@ public class ImageService {
             rectCrop = new Rect(0, offset, (int) finalWidth, res.height() - offset * 2);
         }
 
-        return Utils.bufferedImageToMat(cropImage(thumbnail, rectCrop));
-        //return new Mat(res, rectCrop);
+        //return Utils.bufferedImageToMat(cropImage(thumbnail, rectCrop));
+        return new Mat(res, rectCrop);
     }
 
     private BufferedImage cropImage(BufferedImage src, Rect rect) {
