@@ -53,23 +53,20 @@ public class ImageService {
 
         AtomicBoolean isImageRotated = new AtomicBoolean(false);
         // crop and rotate image
-        String preparedImage = prepareImageForPainting(image, isImageRotated, requestParam.getHost(), uid, requestParam.getWidth(), requestParam.getHeight());
-        image = Imgcodecs.imread(requestParam.getHost() + File.separator + preparedImage);
-        Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2BGRA);
+        Mat preparedImage = prepareImageForPainting(image, isImageRotated, requestParam.getHost(), uid, requestParam.getWidth(), requestParam.getHeight());
+        //image = Imgcodecs.imread(requestParam.getHost() + File.separator + preparedImage);
+        //Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2BGRA);
 
         // create model with prepared image
-        PaintingModel paintingModel = new PaintingModel(requestParam.getWidth(), requestParam.getHeight(), image);
+        PaintingModel paintingModel = new PaintingModel(requestParam.getWidth(), requestParam.getHeight(), preparedImage);
 
         // create pictures with interior and painting
         createInteriorWithPainting(paintingModel, isImageRotated, requestParam.getHost(), uid, responseImages);
 
         // create 3D painting
-        create3DPainting(image, requestParam.getHost(), uid, responseImages);
+        create3DPainting(preparedImage, requestParam.getHost(), uid, responseImages);
 
-        image.release();
-        //preparedImage.release();
-        image = null;
-        preparedImage = null;
+
         long endTime = System.currentTimeMillis();
 
         logger.info("That took {} milliseconds", endTime - startTime);
@@ -79,7 +76,7 @@ public class ImageService {
     }
 
     // crop and rotate image
-    private String prepareImageForPainting(Mat image, AtomicBoolean isImageRotated, String originHost, String productId, int width, int height) {
+    private Mat prepareImageForPainting(Mat image, AtomicBoolean isImageRotated, String originHost, String productId, int width, int height) {
 
         //width = width * 30 ;
         //height = height * 30;
@@ -115,16 +112,12 @@ public class ImageService {
             offset = (int) (res.height() - finalHeight) / 2;
             rectCrop = new Rect(0, offset, (int) finalWidth, res.height() - offset * 2);
         }
-        String fileName = "crop.png";
-        String filePath = "";
 
-        try {
-            filePath = Utils.saveImage(originHost, productId, fileName, Utils.mat2BufferedImage(new Mat(res, rectCrop)));
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(isImageRotated.get()){
+            Core.rotate(new Mat(res, rectCrop), res, Core.ROTATE_90_CLOCKWISE);
+            return res;
         }
-        // return new Mat(res, rectCrop);
-        return filePath;
+        return new Mat(res, rectCrop);
     }
 
     private Mat imagePerspectiveTransform(Mat image) {
@@ -204,9 +197,9 @@ public class ImageService {
                                             String originHost, String productId, List<String> responseImages) {
         List<InteriorModel> walls = new ArrayList<>();
 
-        walls.add(new InteriorModel("/wall1.jpg", 860, 410, 200));
-        walls.add(new InteriorModel("/wall2.jpg", 830, 340, 200));
-        walls.add(new InteriorModel("/wall3.jpg", 1200, 350, 200));
+        walls.add(new InteriorModel("/wall1.jpg", 860, 410, 250));
+        walls.add(new InteriorModel("/wall2.jpg", 830, 340, 250));
+        walls.add(new InteriorModel("/wall3.jpg", 1200, 350, 250));
         AtomicInteger index = new AtomicInteger();
 
         walls.forEach(interiorWall ->
@@ -246,13 +239,14 @@ public class ImageService {
         Mat croppedImage = paintingModel.getImage().clone();
         logger.info("Image was rotated: {}", isImageRotated);
         if (isImageRotated.get()) {
-            Core.rotate(croppedImage, croppedImage, Core.ROTATE_90_CLOCKWISE);
+            //Core.rotate(croppedImage, croppedImage, Core.ROTATE_90_COUNTERCLOCKWISE);
+           // Core.rotate(croppedImage, croppedImage, Core.ROTATE_90_CLOCKWISE);
         }
 
         logger.info("Picture height: {}", croppedImage.height());
         float percentOfNumber = (float) paintingModel.getHeight() / interiorWall.getWallHeight() * 100;
-        if (percentOfNumber >= 30) {
-            percentOfNumber *= 0.7;
+        if (percentOfNumber >= 50) {
+            //percentOfNumber *= 0.7;
         }
         float pixelsForPicture = (float) h / 100 * percentOfNumber;
         float k = pixelsForPicture / croppedImage.height();
