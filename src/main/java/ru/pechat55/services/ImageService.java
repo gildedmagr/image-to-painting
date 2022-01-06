@@ -113,11 +113,12 @@ public class ImageService {
             rectCrop = new Rect(0, offset, (int) finalWidth, res.height() - offset * 2);
         }
 
+        Mat croppedMat = new Mat(res, rectCrop);
         if(isImageRotated.get()){
-            Core.rotate(new Mat(res, rectCrop), res, Core.ROTATE_90_CLOCKWISE);
+            Core.rotate(croppedMat, res, Core.ROTATE_90_CLOCKWISE);
             return res;
         }
-        return new Mat(res, rectCrop);
+        return croppedMat;
     }
 
     private Mat imagePerspectiveTransform(Mat image) {
