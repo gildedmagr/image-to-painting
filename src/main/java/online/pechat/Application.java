@@ -1,4 +1,4 @@
-package ru.pechat55;
+package online.pechat;
 
 import nu.pattern.OpenCV;
 import org.opencv.core.Core;

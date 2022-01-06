@@ -1,6 +1,8 @@
-package ru.pechat55.services;
+package online.pechat.services;
 
 import com.google.gson.Gson;
+import online.pechat.models.ResponseFile;
+import online.pechat.models.UploadResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-import ru.pechat55.models.ResponseFile;
-import ru.pechat55.models.UploadResponse;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

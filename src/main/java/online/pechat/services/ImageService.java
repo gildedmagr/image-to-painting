@@ -1,20 +1,17 @@
-package ru.pechat55.services;
+package online.pechat.services;
 
-import net.coobird.thumbnailator.Thumbnails;
+import online.pechat.models.PaintingModel;
+import online.pechat.models.PreviewResponseModel;
+import online.pechat.utils.Utils;
 import org.opencv.core.*;
 import org.opencv.core.Point;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.pechat55.models.InteriorModel;
-import ru.pechat55.models.PaintingModel;
-import ru.pechat55.models.PreviewResponseModel;
-import ru.pechat55.models.RequestModel;
-import ru.pechat55.utils.Utils;
-import spark.utils.StringUtils;
+import online.pechat.models.InteriorModel;
+import online.pechat.models.RequestModel;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -30,9 +27,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class ImageService {
     private static Logger logger = LoggerFactory.getLogger(ImageService.class);
-
-    @Autowired
-    HttpService httpService;
 
     /**
      * Creates pseudo 3D picture from 2D and generates designs with painting
@@ -54,8 +48,6 @@ public class ImageService {
         AtomicBoolean isImageRotated = new AtomicBoolean(false);
         // crop and rotate image
         Mat preparedImage = prepareImageForPainting(image, isImageRotated, requestParam.getHost(), uid, requestParam.getWidth(), requestParam.getHeight());
-        //image = Imgcodecs.imread(requestParam.getHost() + File.separator + preparedImage);
-        //Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2BGRA);
 
         // create model with prepared image
         PaintingModel paintingModel = new PaintingModel(requestParam.getWidth(), requestParam.getHeight(), preparedImage);
@@ -65,7 +57,6 @@ public class ImageService {
 
         // create 3D painting
         create3DPainting(preparedImage, requestParam.getHost(), uid, responseImages);
-
 
         long endTime = System.currentTimeMillis();
 
@@ -77,31 +68,37 @@ public class ImageService {
 
     // crop and rotate image
     private Mat prepareImageForPainting(Mat image, AtomicBoolean isImageRotated, String originHost, String productId, int width, int height) {
-
-        //width = width * 30 ;
-        //height = height * 30;
-
+        // get biggest side
         float maxSide = Math.min(width, height);
 
+        // calculate width and height using bounding rectangle
         float finalWidth = width / (maxSide / 500);//width * 10 * 3; 80 * 10 * 3 = 2400
         float finalHeight = height / (maxSide / 500);//height * 10 * 3; 100 * 10 * 3 = 3000
 
+        // create result matrix
         Mat res = new Mat(image, new Rect(0, 0, image.cols(), image.rows()));
 
         // picture is in landscape mode or square
+        // rotate it
         if (image.rows() <= image.cols()) {
             logger.info("Picture is in landscape mode, size: {}x{}", image.cols(), image.rows());
             Core.rotate(image, res, Core.ROTATE_90_COUNTERCLOCKWISE);
             isImageRotated.set(true);
         }
 
+        // get coefficient for resize image
         float max = Math.max(finalWidth / (float) res.width(), finalHeight / (float) res.height());
-        logger.info("Resize image: {}x{}", res.width() * max, res.height() * max);
-        Imgproc.resize(res, res, new Size(res.width() * max, res.height() * max), 0, 0, Imgproc.INTER_CUBIC);
+        int resizeWidth = (int)Math.ceil(res.width() * max);
+        int resizeHeight = (int)Math.ceil(res.height() * max);
+
+        logger.info("Resize image: {}x{}", resizeWidth, resizeHeight);
+        // resize image
+        Imgproc.resize(res, res, new Size(resizeWidth, resizeHeight), 0, 0, Imgproc.INTER_CUBIC);
 
 
         int offset;
-        Rect rectCrop = null;
+        Rect rectCrop;
+        // crop image by center
         // need to crop by width
         if (res.width() != finalWidth) {
             logger.info("crop by width");
@@ -112,8 +109,9 @@ public class ImageService {
             offset = (int) (res.height() - finalHeight) / 2;
             rectCrop = new Rect(0, offset, (int) finalWidth, res.height() - offset * 2);
         }
-
+        logger.info("Crop area: {}", rectCrop);
         Mat croppedMat = new Mat(res, rectCrop);
+        // rotate image back if it was rotated in previous step
         if(isImageRotated.get()){
             Core.rotate(croppedMat, res, Core.ROTATE_90_CLOCKWISE);
             return res;
@@ -121,13 +119,16 @@ public class ImageService {
         return croppedMat;
     }
 
+    // transform image using warp perspective
     private Mat imagePerspectiveTransform(Mat image) {
+        // original points
         Point[] srcTri = new Point[4];
         srcTri[0] = new Point(0, 0);
         srcTri[1] = new Point(image.cols() - 1, 0);
         srcTri[2] = new Point(image.cols() - 1, image.rows() - 1);
         srcTri[3] = new Point(0, image.rows() - 1);
 
+        // transform points
         int warpByXAxis = 50;
         int warpByYAxisTop = 40;
         int warpByYAxisBottom = 60;
@@ -137,18 +138,19 @@ public class ImageService {
         dstTri[2] = new Point(image.cols() - 1, image.rows() - 1);
         dstTri[3] = new Point(warpByXAxis, image.rows() - warpByYAxisBottom);
 
-        // write points
-        //drawTransformPoints(filenameFinalWithPoints, image, srcTri, dstTri);
+        // get transform matrix
         Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
 
+        // create empty final matrix
         Mat warpImage = Mat.zeros(image.rows(), image.cols(), CvType.CV_16U);
 
-
-
+        // perform warp transformation
         Imgproc.warpPerspective(image, warpImage, warpMat, warpImage.size(), Imgproc.INTER_CUBIC, Core.BORDER_CONSTANT, new Scalar(255, 255, 255, 255));
 
-
+        // draw line on right edge
         Imgproc.line(warpImage, new Point(warpImage.width() - 1, 0), new Point(warpImage.width() - 1, warpImage.height()), new Scalar(255, 255, 255, 50), 1);
+
+        // remove white area after transformation
         Rect rectCrop = new Rect(warpByXAxis, 0, image.width() - warpByXAxis, image.rows());
         return new Mat(warpImage, rectCrop);
     }
@@ -186,8 +188,10 @@ public class ImageService {
         // perspective transformation
         Mat warpMat = Imgproc.getPerspectiveTransform(new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri));
 
+        // empty final matrix
         Mat warpDst = Mat.zeros(border.rows(), border.cols(), CvType.CV_16U);
 
+        // warp transformation
         Imgproc.warpPerspective(border, warpDst, warpMat, warpDst.size(), Imgproc.INTER_CUBIC, Core.BORDER_CONSTANT, new Scalar(255, 255, 255, 255));
 
         return warpDst;
@@ -238,17 +242,10 @@ public class ImageService {
 
         // clone cropped image
         Mat croppedImage = paintingModel.getImage().clone();
-        logger.info("Image was rotated: {}", isImageRotated);
-        if (isImageRotated.get()) {
-            //Core.rotate(croppedImage, croppedImage, Core.ROTATE_90_COUNTERCLOCKWISE);
-           // Core.rotate(croppedImage, croppedImage, Core.ROTATE_90_CLOCKWISE);
-        }
 
         logger.info("Picture height: {}", croppedImage.height());
         float percentOfNumber = (float) paintingModel.getHeight() / interiorWall.getWallHeight() * 100;
-        if (percentOfNumber >= 50) {
-            //percentOfNumber *= 0.7;
-        }
+
         float pixelsForPicture = (float) h / 100 * percentOfNumber;
         float k = pixelsForPicture / croppedImage.height();
 
@@ -319,11 +316,11 @@ public class ImageService {
         combinedGraphics.drawImage(border, w, 0, null);
         combinedGraphics.dispose();
 
-        BufferedImage finalPicture = createDropShadow(combined, 30);
+       /* BufferedImage finalPicture = createDropShadow(combined, 30);
         Graphics finalPictureGraphics = finalPicture.createGraphics();
         finalPictureGraphics.drawImage(image, (finalPicture.getWidth() - combined.getWidth()) / 2, (finalPicture.getHeight() - combined.getHeight()) / 2, null);
         finalPictureGraphics.drawImage(border, w + (finalPicture.getWidth() - combined.getWidth()) / 2, (finalPicture.getHeight() - combined.getHeight()) / 2, null);
-        finalPictureGraphics.dispose();
+        finalPictureGraphics.dispose();*/
 
 
         String fileName = "painting-3d.png";

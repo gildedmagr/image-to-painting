@@ -1,4 +1,4 @@
-package ru.pechat55.models;
+package online.pechat.models;
 
 public class InteriorModel {
     private String imageName;

@@ -1,4 +1,4 @@
-package ru.pechat55.models;
+package online.pechat.models;
 
 import org.opencv.core.Mat;
 

@@ -1,12 +1,10 @@
-package ru.pechat55.utils;
+package online.pechat.utils;
 
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.pechat55.controllers.IndexController;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -18,7 +16,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.UUID;
 
 public class Utils {
     private static Logger logger = LoggerFactory.getLogger(Utils.class);

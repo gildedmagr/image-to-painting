@@ -1,4 +1,4 @@
-package ru.pechat55.models;
+package online.pechat.models;
 
 import java.util.ArrayList;
 import java.util.List;
