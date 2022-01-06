@@ -1,6 +1,6 @@
 <configuration>
     <timestamp key="byDay" datePattern="yyyyMMdd"/>
-    <property name="LOG_DIR" value="logs" />
+    <property name="LOG_DIR" value="/code/logs" />
     <appender name="STDOUT"
               class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
