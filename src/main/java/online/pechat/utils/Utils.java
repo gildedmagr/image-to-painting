@@ -133,11 +133,13 @@ public class Utils {
     public static String saveImage(String parentPath, String id, String finalName, BufferedImage image){
         String filePath = createFinalDir(parentPath, id) + finalName;
         String extension = image.getType() == BufferedImage.TYPE_INT_RGB ? "JPG" : "PNG";
+        logger.info("Saving image, path: {}", filePath);
         try {
             ImageIO.write(image, extension, new File(parentPath, filePath));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Can't save image, error: {}", e.getMessage());
         }
+        logger.info("Image has been saved, path: {}", filePath);
         return filePath;
     }
 

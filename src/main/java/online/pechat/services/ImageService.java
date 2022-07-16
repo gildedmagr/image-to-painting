@@ -41,22 +41,28 @@ public class ImageService {
 
         String uid = requestParam.getUid() == null || "".equals(requestParam.getUid()) ? UUID.randomUUID().toString() : requestParam.getUid();
 
-        //Mat image = Utils.urlToMat(url);
-        Mat image = Imgcodecs.imread(requestParam.getHost() + File.separator + requestParam.getUrl());
+        String imagePath = requestParam.getHost() + File.separator + requestParam.getUrl();
+        logger.info("Reading image, path: {}", imagePath);
+        Mat image = Imgcodecs.imread(imagePath);
+        logger.info("Image has been read, converting to RGBA");
         Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2BGRA);
 
         AtomicBoolean isImageRotated = new AtomicBoolean(false);
+
         // crop and rotate image
+        logger.info("Going to crop, resize and rotate image");
         Mat preparedImage = prepareImageForPainting(image, isImageRotated, requestParam.getHost(), uid, requestParam.getWidth(), requestParam.getHeight());
 
         // create model with prepared image
         PaintingModel paintingModel = new PaintingModel(requestParam.getWidth(), requestParam.getHeight(), preparedImage);
 
-        // create pictures with interior and painting
+        logger.info("Create pictures with interior and painting");
         createInteriorWithPainting(paintingModel, isImageRotated, requestParam.getHost(), uid, responseImages);
+        logger.info("Created pictures with interior and painting, number of interiors: {}", responseImages.size());
 
-        // create 3D painting
+        logger.info("Create 3D painting");
         create3DPainting(preparedImage, requestParam.getHost(), uid, responseImages);
+        logger.info("Created 3D painting");
 
         long endTime = System.currentTimeMillis();
 
@@ -218,6 +224,7 @@ public class ImageService {
     private Optional<String> drawPictureOnWall(PaintingModel paintingModel, AtomicInteger index,
                                                InteriorModel interiorWall, AtomicBoolean isImageRotated,
                                                String originHost, String productId) {
+        logger.info("Creating interior: {} with painting", interiorWall.getImageName());
         // get IS from resource directory
         InputStream is = ImageService.class.getResourceAsStream(interiorWall.getImageName());
 
@@ -231,7 +238,7 @@ public class ImageService {
         try {
             wall = ImageIO.read(is);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Can't read interior picture, error: {}", e.getMessage());
             return Optional.empty();
         }
 
@@ -248,8 +255,6 @@ public class ImageService {
 
         float pixelsForPicture = (float) h / 100 * percentOfNumber;
         float k = pixelsForPicture / croppedImage.height();
-
-        logger.info("K for resize is: {}", k);
 
 
         logger.info("Final height: {}, width: {}", croppedImage.height() * k, croppedImage.width() * k);
@@ -286,13 +291,16 @@ public class ImageService {
 
         String fileName = "final-interior-" + (index.getAndIncrement()) + ".jpg";
         String filePath = Utils.saveImage(originHost, productId, fileName, combined);
+        logger.info("Created interior: {} with painting, final name: {}", interiorWall.getImageName(), fileName);
         return Optional.of(filePath);
     }
 
 
     public void create3DPainting(Mat croppedImage, String serverPath, String productId, List<String> responseImages) {
 
+        logger.info("Transform image using perspective");
         Mat warpImageMat = imagePerspectiveTransform(croppedImage);
+        logger.info("Create 3D border to imitate a painting");
         Mat borderMat = createPaintingBorder(croppedImage);
 
         BufferedImage image = null;
@@ -311,10 +319,12 @@ public class ImageService {
         BufferedImage combined = new BufferedImage(w + border.getWidth(), h, BufferedImage.TYPE_INT_RGB);
 
         // paint both images, preserving the alpha channels
+        logger.info("Combine transformed image and border");
         Graphics combinedGraphics = combined.createGraphics();
         combinedGraphics.drawImage(image, 0, 0, null);
         combinedGraphics.drawImage(border, w, 0, null);
         combinedGraphics.dispose();
+        logger.info("Images have been combined");
 
        /* BufferedImage finalPicture = createDropShadow(combined, 30);
         Graphics finalPictureGraphics = finalPicture.createGraphics();
