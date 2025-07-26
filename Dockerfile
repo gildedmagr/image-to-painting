@@ -1,6 +1,4 @@
-FROM zsydocker/opencv-java:3.4.5-oracle-java11
-
-
+FROM rieckpil/opencv-java:3.4.3
 
 WORKDIR /code
 
