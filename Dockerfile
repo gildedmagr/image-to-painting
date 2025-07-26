@@ -1,4 +1,4 @@
-FROM yevhengren/opencv-java
+FROM zsydocker/opencv-java:3.4.5-oracle-java11
 
 
 
