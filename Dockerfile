@@ -1,4 +1,4 @@
-FROM asuprun/opencv-java
+FROM yevhengren/opencv-java
 
 
 
